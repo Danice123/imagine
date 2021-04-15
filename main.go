@@ -131,5 +131,7 @@ func main() {
 	router.GET("/raw/*path", raw)
 	router.GET("/browse/*path", image)
 	router.GET("/api/random", toggleRandom)
-	http.ListenAndServe(":8080", router)
+	if err := http.ListenAndServe(":8080", router); err != nil {
+		panic(err.Error())
+	}
 }
