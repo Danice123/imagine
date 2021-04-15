@@ -126,12 +126,12 @@ func findPreviousFile(files []fs.DirEntry, current int) (string, bool) {
 }
 
 func main() {
-	root = os.Args[1]
+	root = os.Args[2]
 	router := httprouter.New()
 	router.GET("/raw/*path", raw)
 	router.GET("/browse/*path", image)
 	router.GET("/api/random", toggleRandom)
-	if err := http.ListenAndServe(":8080", router); err != nil {
+	if err := http.ListenAndServe(os.Args[1], router); err != nil {
 		panic(err.Error())
 	}
 }
