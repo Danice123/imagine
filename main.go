@@ -16,7 +16,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-var root = "C:\\Users\\Dan\\test"
+var root string
 
 func raw(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	http.ServeFile(w, req, filepath.Join(root, ps.ByName("path")))
@@ -126,6 +126,7 @@ func findPreviousFile(files []fs.DirEntry, current int) (string, bool) {
 }
 
 func main() {
+	root = os.Args[1]
 	router := httprouter.New()
 	router.GET("/raw/*path", raw)
 	router.GET("/browse/*path", image)
