@@ -1,24 +1,7 @@
-package main
-
-import (
-	"html/template"
-)
-
-type ImageData struct {
-	Url         string
-	Mimetype    string
-	IsVideo     bool
-	HasNext     bool
-	Next        string
-	HasPrevious bool
-	Previous    string
-	RandomState string
-}
-
-var imageTemplateHtml = `
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
 		<style>
 			video {
 				position: absolute;
@@ -52,38 +35,34 @@ var imageTemplateHtml = `
 		</style>
 	</head>
 	<body style="background-color: black; text-align: center;">
-		{{if .IsVideo}}
+		{{if .Image.IsVideo}}
 		<video autoplay loop>
-			<source src="{{.Url}}" type="{{.Mimetype}}">
+			<source src="/raw{{.Url}}" type="{{.Image.Mimetype}}">
 		</video>
 		{{else}}
-		<img src="{{.Url}}" />
+		<img src="/raw{{.Url}}" />
 		{{end}}
-		{{if .HasPrevious}}
 		<div style="position: fixed; bottom: 0px; left: 0px; z-index: 2147483600;">
-			<a href="{{.Previous}}">
+			<a href="{{.Previous}}?filter={{.Filter}}">
 				<img title="Previous" src="chrome-extension://lhlckkgdiojkapplglfeomlkjllphilo/img/arrow_left.png" width="77" style="float:left;position:relative;cursor:pointer;vertical-align: bottom;">
 			</a>
 		</div>
-		{{end}}
-		{{if .HasNext}}
 		<div id="next" style="position: fixed; bottom: 0px; right: 0px; z-index: 2147483600;">
-			<a href="{{.Next}}">
+			<a href="{{.Next}}?filter={{.Filter}}">
 				<img title="Next" src="chrome-extension://lhlckkgdiojkapplglfeomlkjllphilo/img/arrow_right.png" width="77" style="float:right;position:relative;cursor:pointer;vertical-align: bottom;">
 			</a>
 			<a href="/api/random">
 				<img id="random" title="Toggle Random ({{.RandomState}})" src="chrome-extension://lhlckkgdiojkapplglfeomlkjllphilo/img/r_left.png" width="28" style="cursor: pointer; position: relative; vertical-align: bottom;">
 			</a>
 		</div>
-		{{end}}
+		<div id="tags" class="btn-group-vertical" style="position: fixed; top: 0px; left: 0px; z-index: 2147483600;">
+			{{range .Tags}}
+				{{if .Valid}}
+					<a class="btn btn-success" href="/api/tag{{$.Url}}?name={{.Name}}">{{.Name}}</a>
+				{{else}}
+					<a class="btn btn-danger" href="/api/tag{{$.Url}}?name={{.Name}}">{{.Name}}</a>
+				{{end}}
+			{{end}}
+		</div>
 	</body>
 </html>
-`
-
-var imageTemplate = template.New("Image")
-
-func init() {
-	if _, err := imageTemplate.Parse(imageTemplateHtml); err != nil {
-		panic(err.Error())
-	}
-}
