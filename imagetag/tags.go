@@ -15,7 +15,7 @@ type TagFile struct {
 
 func New(root string) (*TagFile, error) {
 	if rawJson, err := os.ReadFile(filepath.Join(root, ".tags.json")); err != nil {
-		return nil, err
+		return &TagFile{}, nil
 	} else {
 		tagFile := &TagFile{}
 		if err := json.Unmarshal(rawJson, tagFile); err != nil {
