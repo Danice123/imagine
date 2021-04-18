@@ -62,7 +62,7 @@ func (this *TagFile) WriteTag(root string, file string, tag string) error {
 	} else {
 		this.TagMapping[file][tag] = struct{}{}
 	}
-	if jsonData, err := json.Marshal(this); err != nil {
+	if jsonData, err := json.MarshalIndent(this, "", "\t"); err != nil {
 		return err
 	} else {
 		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, os.ModeAppend); err != nil {
