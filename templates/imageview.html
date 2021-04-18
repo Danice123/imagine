@@ -29,7 +29,7 @@
 				display: none;
 			}
 
-			#next:hover #random {
+			#next_button_div:hover #random {
 				display: inline;
 			}
 		</style>
@@ -43,12 +43,12 @@
 		<img src="/raw{{.Url}}" />
 		{{end}}
 		<div style="position: fixed; bottom: 0px; left: 0px; z-index: 2147483600;">
-			<a href="{{.Previous}}?filter={{.Filter}}">
+			<a id="previous" href="{{.Previous}}?filter={{.Filter}}">
 				<img title="Previous" src="chrome-extension://lhlckkgdiojkapplglfeomlkjllphilo/img/arrow_left.png" width="77" style="float:left;position:relative;cursor:pointer;vertical-align: bottom;">
 			</a>
 		</div>
-		<div id="next" style="position: fixed; bottom: 0px; right: 0px; z-index: 2147483600;">
-			<a href="{{.Next}}?filter={{.Filter}}">
+		<div id="next_button_div" style="position: fixed; bottom: 0px; right: 0px; z-index: 2147483600;">
+			<a id="next" href="{{.Next}}?filter={{.Filter}}">
 				<img title="Next" src="chrome-extension://lhlckkgdiojkapplglfeomlkjllphilo/img/arrow_right.png" width="77" style="float:right;position:relative;cursor:pointer;vertical-align: bottom;">
 			</a>
 			<a href="/api/random">
@@ -64,5 +64,17 @@
 				{{end}}
 			{{end}}
 		</div>
+		<script>
+			document.addEventListener("keydown", function(e) {
+				switch (e.keyCode) {
+				case 37: // left
+					window.location.href = document.getElementById("previous").getAttribute("href")
+					break;
+				case 39: // right
+					window.location.href = document.getElementById("next").getAttribute("href")
+					break;
+				}
+			})
+		</script>
 	</body>
 </html>
