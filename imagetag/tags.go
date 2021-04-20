@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/Danice123/imagine/imageinstance"
 )
@@ -41,12 +43,24 @@ func (this *TagFile) ReadTags(file string) []imageinstance.Tag {
 	return tags
 }
 
-func (this *TagFile) HasTag(file string, tag string) bool {
+func (this *TagFile) HasTag(file string, tag string) (bool, error) {
 	if this.TagMapping[file] == nil {
-		return false
+		return false, nil
 	}
-	_, ok := this.TagMapping[file][tag]
-	return ok
+	if _, ok := this.TagMapping[file][tag]; ok {
+		return ok, nil
+	} else if expression, err := regexp.Compile("(?i)" + strings.ReplaceAll(regexp.QuoteMeta(tag), "*", ".*")); err != nil {
+		println(err.Error())
+		return false, err
+	} else {
+		println(tag)
+		for tagOnFile, _ := range this.TagMapping[file] {
+			if expression.MatchString(tagOnFile) {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
 }
 
 func (this *TagFile) WriteTag(root string, file string, tag string) error {

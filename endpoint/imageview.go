@@ -73,7 +73,11 @@ func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps ht
 	if data.Filter != "" {
 		filter = func(name string) bool {
 			imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), this.Root), "\\", "/")
-			return !tags.HasTag(imageName, data.Filter)
+			if ok, err := tags.HasTag(imageName, data.Filter); err != nil {
+				return false
+			} else {
+				return !ok
+			}
 		}
 	}
 
