@@ -17,11 +17,12 @@ import (
 
 type ImageData struct {
 	Url         string
-	Filter      string
+	QueryString string
 	Next        string
 	Previous    string
 	RandomState string
 	Image       *imageinstance.ImageInstance
+	ShowTags    bool
 	Tags        []imageinstance.Tag
 }
 
@@ -29,6 +30,8 @@ func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps ht
 	data := &ImageData{
 		Url:         ps.ByName("path"),
 		RandomState: "Off",
+		QueryString: req.URL.Query().Encode(),
+		ShowTags:    req.URL.Query().Get("tags") != "",
 	}
 
 	isRandom := false
@@ -69,11 +72,10 @@ func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps ht
 		return
 	}
 
-	data.Filter = req.URL.Query().Get("filter")
-	if data.Filter != "" {
+	if req.URL.Query().Get("filter") != "" {
 		filter = func(name string) bool {
 			imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), this.Root), "\\", "/")
-			if ok, err := tags.HasTag(imageName, data.Filter); err != nil {
+			if ok, err := tags.HasTag(imageName, req.URL.Query().Get("filter")); err != nil {
 				return false
 			} else {
 				return !ok
