@@ -67,11 +67,6 @@ func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps ht
 		return false
 	}
 
-	if targetImage.IsDir {
-		http.Redirect(w, req, strings.TrimSuffix(req.RequestURI, "/")+"/"+iterator.FindNextFile(1, filter), http.StatusFound)
-		return
-	}
-
 	if req.URL.Query().Get("filter") != "" {
 		filter = func(name string) bool {
 			imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), this.Root), "\\", "/")
@@ -81,6 +76,11 @@ func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps ht
 				return !ok
 			}
 		}
+	}
+
+	if targetImage.IsDir {
+		http.Redirect(w, req, strings.TrimPrefix(ps.ByName("path"), "/")+"/browse/"+iterator.FindNextFile(1, filter)+"?"+req.URL.Query().Encode(), http.StatusFound)
+		return
 	}
 
 	data.Next = iterator.FindNextFile(1, filter)
