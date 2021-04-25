@@ -45,10 +45,9 @@ func (this *TagFile) ReadTags(file string) []imageinstance.Tag {
 
 func (this *TagFile) HasTag(file string, tag string) (bool, error) {
 	if this.TagMapping[file] == nil {
-		return false, nil
+		return tag == "None", nil
 	}
-
-	if tag == "None" && len(this.TagMapping) == 0 {
+	if tag == "None" && len(this.TagMapping[file]) == 0 {
 		return true, nil
 	}
 
