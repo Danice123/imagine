@@ -12,11 +12,11 @@ import (
 )
 
 type HomeData struct {
+	Name    string
 	Folders []string
 }
 
 func (this *Endpoints) Home(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-
 	folders := []string{}
 	filepath.WalkDir(this.Root, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
@@ -33,6 +33,7 @@ func (this *Endpoints) Home(w http.ResponseWriter, req *http.Request, ps httprou
 			panic(err.Error())
 		} else {
 			homeTemplate.Execute(w, HomeData{
+				Name:    filepath.Base(this.Root),
 				Folders: folders,
 			})
 		}
