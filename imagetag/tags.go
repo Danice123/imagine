@@ -53,7 +53,7 @@ func (this *TagFile) HasTag(file string, tag string) (bool, error) {
 
 	if _, ok := this.TagMapping[file][tag]; ok {
 		return ok, nil
-	} else if expression, err := regexp.Compile("^(?i)" + strings.ReplaceAll(regexp.QuoteMeta(tag), "*", ".*") + "$"); err != nil {
+	} else if expression, err := regexp.Compile("^(?i)" + strings.ReplaceAll(regexp.QuoteMeta(tag), "\\*", ".*") + "$"); err != nil {
 		return false, err
 	} else {
 		for tagOnFile, _ := range this.TagMapping[file] {
