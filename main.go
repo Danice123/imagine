@@ -15,6 +15,7 @@ func main() {
 		Root: os.Args[2],
 	}
 
+	router.GET("/", endpoints.Home)
 	router.GET("/raw/*path", endpoints.RawImage)
 	router.GET("/browse/*path", endpoints.ImageView)
 	router.GET("/api/random", endpoints.ToggleRandom)
