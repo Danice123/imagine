@@ -79,7 +79,8 @@ func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps ht
 	}
 
 	if targetImage.IsDir {
-		http.Redirect(w, req, strings.TrimPrefix(ps.ByName("path"), "/")+"/browse/"+iterator.FindNextFile(1, filter)+"?"+req.URL.Query().Encode(), http.StatusFound)
+		path := strings.TrimSuffix(strings.TrimPrefix(ps.ByName("path"), "/"), "/")
+		http.Redirect(w, req, "/browse/"+path+"/"+iterator.FindNextFile(1, filter)+"?"+req.URL.Query().Encode(), http.StatusFound)
 		return
 	}
 
