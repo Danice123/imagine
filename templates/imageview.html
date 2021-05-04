@@ -72,7 +72,7 @@
 			</a>
 		</div>
 		{{if .ShowTags}}
-			<div id="tags" class="btn-group-vertical" style="position: fixed; top: 0px; left: 0px; z-index: 2147483600;">
+			<div id="tags" class="btn-group-vertical" style="position: fixed; top: 0px; left: 0px; z-index: 2147483600; flex-wrap: wrap; height: 80%;">
 				{{range .Tags}}
 					{{if .Valid}}
 						<a class="btn btn-success" href="/api/tag{{$.Url}}?name={{.Name}}">{{.Name}}</a>
