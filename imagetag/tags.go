@@ -56,7 +56,7 @@ func (ths *TagFile) HasTag(file string, tag string) (bool, error) {
 	} else if expression, err := regexp.Compile("^(?i)" + strings.ReplaceAll(regexp.QuoteMeta(tag), "\\*", ".*") + "$"); err != nil {
 		return false, err
 	} else {
-		for tagOnFile, _ := range ths.TagMapping[file] {
+		for tagOnFile := range ths.TagMapping[file] {
 			if expression.MatchString(tagOnFile) {
 				return true, nil
 			}
