@@ -16,11 +16,11 @@ type HomeData struct {
 	Folders []string
 }
 
-func (this *Endpoints) Home(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+func (ths *Endpoints) Home(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	folders := []string{}
-	filepath.WalkDir(this.Root, func(path string, d fs.DirEntry, err error) error {
+	filepath.WalkDir(ths.Root, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
-			folders = append(folders, strings.ReplaceAll(strings.TrimPrefix(path+"/", this.Root), "\\", "/"))
+			folders = append(folders, strings.ReplaceAll(strings.TrimPrefix(path+"/", ths.Root), "\\", "/"))
 		}
 		return nil
 	})
@@ -33,7 +33,7 @@ func (this *Endpoints) Home(w http.ResponseWriter, req *http.Request, ps httprou
 			panic(err.Error())
 		} else {
 			homeTemplate.Execute(w, HomeData{
-				Name:    filepath.Base(this.Root),
+				Name:    filepath.Base(ths.Root),
 				Folders: folders,
 			})
 		}

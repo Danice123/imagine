@@ -16,13 +16,13 @@ type TagData struct {
 	TagMap map[string]int
 }
 
-func (this *Endpoints) TagView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	tags, err := imagetag.New(this.Root)
+func (ths *Endpoints) TagView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	tags, err := imagetag.New(ths.Root)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	if files, err := os.ReadDir(filepath.Join(this.Root, ps.ByName("path"))); err != nil {
+	if files, err := os.ReadDir(filepath.Join(ths.Root, ps.ByName("path"))); err != nil {
 		http.Error(w, "Incorrent directory specified", http.StatusBadRequest)
 	} else {
 		data := TagData{

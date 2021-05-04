@@ -5,6 +5,7 @@
     </head>
     <body>
         <ul>
+            <li><a href="/browse{{$.Path}}">ALL</a></li>
             {{range $tag, $amount := .TagMap}}
                 <li>
                     <a href="/browse{{$.Path}}?filter={{$tag}}">{{$tag}}</a>: {{$amount}}

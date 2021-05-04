@@ -10,7 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (this *Endpoints) ToggleRandom(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+func (ths *Endpoints) ToggleRandom(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	if _, err := req.Cookie("random"); err == nil {
 		http.SetCookie(w, &http.Cookie{
 			Name:   "random",
@@ -28,8 +28,8 @@ func (this *Endpoints) ToggleRandom(w http.ResponseWriter, req *http.Request, ps
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }
 
-func (this *Endpoints) ToggleTag(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	targetImage, err := imageinstance.New(ps.ByName("path"), this.Root)
+func (ths *Endpoints) ToggleTag(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	targetImage, err := imageinstance.New(ps.ByName("path"), ths.Root)
 	if err != nil {
 		http.Error(w, "Not Found", http.StatusNotFound)
 		return
@@ -44,10 +44,10 @@ func (this *Endpoints) ToggleTag(w http.ResponseWriter, req *http.Request, ps ht
 		return
 	}
 
-	if tags, err := imagetag.New(this.Root); err != nil {
+	if tags, err := imagetag.New(ths.Root); err != nil {
 		panic(err.Error())
 	} else {
-		if err := tags.WriteTag(this.Root, ps.ByName("path"), tagName); err != nil {
+		if err := tags.WriteTag(ths.Root, ps.ByName("path"), tagName); err != nil {
 			panic(err.Error())
 		}
 	}

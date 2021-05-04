@@ -17,19 +17,21 @@ import (
 
 type ImageData struct {
 	Url         string
+	Path        string
 	QueryString string
 	Next        string
 	Previous    string
-	RandomState string
+	RandomState bool
 	Image       *imageinstance.ImageInstance
 	ShowTags    bool
 	Tags        []imageinstance.Tag
 }
 
-func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	data := &ImageData{
 		Url:         ps.ByName("path"),
-		RandomState: "Off",
+		Path:        filepath.Dir(ps.ByName("path")),
+		RandomState: false,
 		QueryString: req.URL.Query().Encode(),
 		ShowTags:    req.URL.Query().Get("tags") != "",
 	}
@@ -37,19 +39,19 @@ func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps ht
 	isRandom := false
 	if cookie, err := req.Cookie("random"); err == nil {
 		isRandom = true
-		data.RandomState = "On"
+		data.RandomState = true
 		seed, _ := strconv.ParseInt(cookie.Value, 10, 64)
 		rand.Seed(seed)
 	}
 
-	targetImage, err := imageinstance.New(ps.ByName("path"), this.Root)
+	targetImage, err := imageinstance.New(ps.ByName("path"), ths.Root)
 	if err != nil {
 		http.Error(w, "Not Found", http.StatusNotFound)
 		return
 	}
 	data.Image = targetImage
 
-	tags, err := imagetag.New(this.Root)
+	tags, err := imagetag.New(ths.Root)
 	if err != nil {
 		panic(err.Error())
 	} else {
@@ -69,7 +71,7 @@ func (this *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps ht
 
 	if req.URL.Query().Get("filter") != "" {
 		filter = func(name string) bool {
-			imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), this.Root), "\\", "/")
+			imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), ths.Root), "\\", "/")
 			if ok, err := tags.HasTag(imageName, req.URL.Query().Get("filter")); err != nil {
 				return false
 			} else {

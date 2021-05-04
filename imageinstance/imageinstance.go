@@ -41,9 +41,9 @@ func New(relativePath string, rootPath string) (*ImageInstance, error) {
 	return new, nil
 }
 
-func (this *ImageInstance) BaseDir() string {
-	if this.IsDir {
-		return this.FullPath
+func (ths *ImageInstance) BaseDir() string {
+	if ths.IsDir {
+		return ths.FullPath
 	}
-	return filepath.Dir(this.FullPath)
+	return filepath.Dir(ths.FullPath)
 }

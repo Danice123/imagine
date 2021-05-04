@@ -28,11 +28,11 @@ func New(root string) (*TagFile, error) {
 	}
 }
 
-func (this *TagFile) ReadTags(file string) []imageinstance.Tag {
+func (ths *TagFile) ReadTags(file string) []imageinstance.Tag {
 	tags := []imageinstance.Tag{}
-	for _, tag := range this.Tags {
+	for _, tag := range ths.Tags {
 		isValid := false
-		if _, ok := this.TagMapping[file][tag]; ok {
+		if _, ok := ths.TagMapping[file][tag]; ok {
 			isValid = true
 		}
 		tags = append(tags, imageinstance.Tag{
@@ -43,20 +43,20 @@ func (this *TagFile) ReadTags(file string) []imageinstance.Tag {
 	return tags
 }
 
-func (this *TagFile) HasTag(file string, tag string) (bool, error) {
-	if this.TagMapping[file] == nil {
+func (ths *TagFile) HasTag(file string, tag string) (bool, error) {
+	if ths.TagMapping[file] == nil {
 		return tag == "None", nil
 	}
-	if tag == "None" && len(this.TagMapping[file]) == 0 {
+	if tag == "None" && len(ths.TagMapping[file]) == 0 {
 		return true, nil
 	}
 
-	if _, ok := this.TagMapping[file][tag]; ok {
+	if _, ok := ths.TagMapping[file][tag]; ok {
 		return ok, nil
 	} else if expression, err := regexp.Compile("^(?i)" + strings.ReplaceAll(regexp.QuoteMeta(tag), "\\*", ".*") + "$"); err != nil {
 		return false, err
 	} else {
-		for tagOnFile, _ := range this.TagMapping[file] {
+		for tagOnFile, _ := range ths.TagMapping[file] {
 			if expression.MatchString(tagOnFile) {
 				return true, nil
 			}
@@ -65,20 +65,20 @@ func (this *TagFile) HasTag(file string, tag string) (bool, error) {
 	}
 }
 
-func (this *TagFile) WriteTag(root string, file string, tag string) error {
-	if this.TagMapping == nil {
-		this.TagMapping = make(map[string]map[string]struct{})
+func (ths *TagFile) WriteTag(root string, file string, tag string) error {
+	if ths.TagMapping == nil {
+		ths.TagMapping = make(map[string]map[string]struct{})
 	}
-	if this.TagMapping[file] == nil {
-		this.TagMapping[file] = make(map[string]struct{})
+	if ths.TagMapping[file] == nil {
+		ths.TagMapping[file] = make(map[string]struct{})
 	}
 
-	if _, ok := this.TagMapping[file][tag]; ok {
-		delete(this.TagMapping[file], tag)
+	if _, ok := ths.TagMapping[file][tag]; ok {
+		delete(ths.TagMapping[file], tag)
 	} else {
-		this.TagMapping[file][tag] = struct{}{}
+		ths.TagMapping[file][tag] = struct{}{}
 	}
-	if jsonData, err := json.MarshalIndent(this, "", "\t"); err != nil {
+	if jsonData, err := json.MarshalIndent(ths, "", "\t"); err != nil {
 		return err
 	} else {
 		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, os.ModeAppend); err != nil {

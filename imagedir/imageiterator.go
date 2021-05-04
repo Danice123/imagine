@@ -35,11 +35,11 @@ func New(imageDir string, currentImagePath string, sorter func([]fs.DirEntry)) *
 	return new
 }
 
-func (this *ImageDirIterator) FindNextFile(direction int, filter func(string) bool) string {
-	n := this.currentFile + direction
+func (ths *ImageDirIterator) FindNextFile(direction int, filter func(string) bool) string {
+	n := ths.currentFile + direction
 	hasLooped := false
 	for {
-		if n >= len(this.Files) {
+		if n >= len(ths.Files) {
 			n = 0
 			if hasLooped {
 				return ""
@@ -47,19 +47,19 @@ func (this *ImageDirIterator) FindNextFile(direction int, filter func(string) bo
 			hasLooped = true
 		}
 		if n < 0 {
-			n = len(this.Files) - 1
+			n = len(ths.Files) - 1
 			if hasLooped {
 				return ""
 			}
 			hasLooped = true
 		}
-		if this.Files[n].IsDir() || this.Files[n].Name() == ".tags.json" || filter(this.Files[n].Name()) {
+		if ths.Files[n].IsDir() || ths.Files[n].Name() == ".tags.json" || filter(ths.Files[n].Name()) {
 			n += direction
 			continue
 		}
 		break
 	}
-	return this.Files[n].Name()
+	return ths.Files[n].Name()
 }
 
 func SortByName(slice []fs.DirEntry) {
