@@ -3,6 +3,8 @@ package endpoint
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/Danice123/imagine/imageinstance"
@@ -51,5 +53,20 @@ func (ths *Endpoints) ToggleTag(w http.ResponseWriter, req *http.Request, ps htt
 			panic(err.Error())
 		}
 	}
+	http.Redirect(w, req, req.Referer(), http.StatusFound)
+}
+
+func (ths *Endpoints) CleanImages(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	tags, err := imagetag.New(ths.Root)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	for path := range tags.TagMapping {
+		if _, err := os.Stat(filepath.Join(ths.Root, path)); err != nil {
+			delete(tags.TagMapping, path)
+		}
+	}
+
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }
