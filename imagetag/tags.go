@@ -11,12 +11,6 @@ import (
 	"github.com/Danice123/imagine/imageinstance"
 )
 
-type TagFileOld struct {
-	Tags        []string
-	TagMapping  map[string]map[string]struct{}
-	ImageHashes map[string]string
-}
-
 type TagTable struct {
 	Tags    []string
 	Mapping map[string]*TagFile
