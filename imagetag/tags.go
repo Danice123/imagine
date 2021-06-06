@@ -45,7 +45,7 @@ func (ths *TagTable) writeFile(root string) error {
 	if jsonData, err := json.MarshalIndent(ths, "", "\t"); err != nil {
 		return err
 	} else {
-		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, 0x777); err != nil {
+		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, os.FileMode(int(0777))); err != nil {
 			return err
 		}
 	}
@@ -111,6 +111,11 @@ func (ths *TagTable) WriteTag(root string, file string, tag string) error {
 		ths.Mapping[file].Tags[tag] = struct{}{}
 	}
 
+	return ths.writeFile(root)
+}
+
+func (ths *TagTable) DeleteFile(root string, file string) error {
+	delete(ths.Mapping, file)
 	return ths.writeFile(root)
 }
 

@@ -10,7 +10,7 @@
             {{range .Duplicates}}
                 <li><b>{{.Type}}:</b>
                     {{range .Images}}
-                        {{.}},
+                        <a href="/api/trash{{.}}">{{.}}</a>,
                     {{end}}
                 </li>
             {{end}}

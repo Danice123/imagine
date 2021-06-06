@@ -24,6 +24,8 @@ func main() {
 	router.GET("/api/random", endpoints.ToggleRandom)
 	router.GET("/api/tag/*path", endpoints.ToggleTag)
 	router.GET("/api/scan/:hash", endpoints.ScanImages)
+	router.GET("/api/clean", endpoints.CleanImages)
+	router.GET("/api/trash/*path", endpoints.TrashImage)
 	if err := http.ListenAndServe(os.Args[1], router); err != nil {
 		panic(err.Error())
 	}
