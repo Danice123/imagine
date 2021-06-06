@@ -9,6 +9,8 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/corona10/goimagehash"
 )
@@ -25,6 +27,16 @@ func md5Hash(path string) (string, error) {
 }
 
 func averageHash(path string) (string, error) {
+	switch strings.ToLower(filepath.Ext(path)) {
+	case ".png":
+	case ".jpg":
+	case ".jpeg":
+	case ".gif":
+		break
+	default:
+		return "", nil
+	}
+
 	if file, err := os.Open(path); err != nil {
 		return "", err
 	} else {
