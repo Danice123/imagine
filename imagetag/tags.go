@@ -98,9 +98,7 @@ func (ths *TagFile) WriteTag(root string, file string, tag string) error {
 }
 
 func (ths *TagFile) ScanImages(root string) error {
-	if ths.ImageHashes == nil {
-		ths.ImageHashes = make(map[string]string)
-	}
+	ths.ImageHashes = make(map[string]string)
 
 	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
 		if !info.IsDir() && info.Name() != ".tags.json" {
