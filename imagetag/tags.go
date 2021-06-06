@@ -1,8 +1,6 @@
 package imagetag
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"io/fs"
 	"os"
@@ -13,43 +11,57 @@ import (
 	"github.com/Danice123/imagine/imageinstance"
 )
 
-type TagFile struct {
+type TagFileOld struct {
 	Tags        []string
 	TagMapping  map[string]map[string]struct{}
 	ImageHashes map[string]string
 }
 
-func New(root string) (*TagFile, error) {
+type TagTable struct {
+	Tags    []string
+	Mapping map[string]*TagFile
+}
+
+type TagFile struct {
+	Tags  map[string]struct{}
+	MD5   string
+	AHash string
+}
+
+func New(root string) (*TagTable, error) {
 	if rawJson, err := os.ReadFile(filepath.Join(root, ".tags.json")); err != nil {
-		return &TagFile{}, nil
+		return &TagTable{}, nil
 	} else {
-		tagFile := &TagFile{}
-		if err := json.Unmarshal(rawJson, tagFile); err != nil {
+		tagTable := &TagTable{}
+		if err := json.Unmarshal(rawJson, tagTable); err != nil {
 			return nil, err
 		} else {
-			return tagFile, nil
+			return tagTable, nil
 		}
 	}
 }
 
-func (ths *TagFile) writeFile(root string) error {
+func (ths *TagTable) writeFile(root string) error {
 	if jsonData, err := json.MarshalIndent(ths, "", "\t"); err != nil {
 		return err
 	} else {
-		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, os.ModeAppend); err != nil {
+		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, 0x777); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (ths *TagFile) ReadTags(file string) []imageinstance.Tag {
+func (ths *TagTable) ReadTags(file string) []imageinstance.Tag {
 	tags := []imageinstance.Tag{}
 	for _, tag := range ths.Tags {
 		isValid := false
-		if _, ok := ths.TagMapping[file][tag]; ok {
-			isValid = true
+		if _, ok := ths.Mapping[file]; ok {
+			if _, ok := ths.Mapping[file].Tags[tag]; ok {
+				isValid = true
+			}
 		}
+
 		tags = append(tags, imageinstance.Tag{
 			Name:  tag,
 			Valid: isValid,
@@ -58,20 +70,22 @@ func (ths *TagFile) ReadTags(file string) []imageinstance.Tag {
 	return tags
 }
 
-func (ths *TagFile) HasTag(file string, tag string) (bool, error) {
-	if ths.TagMapping[file] == nil {
+func (ths *TagTable) HasTag(file string, tag string) (bool, error) {
+	// Doesn't have a entry for the file yet
+	if _, ok := ths.Mapping[file]; !ok {
 		return tag == "None", nil
 	}
-	if tag == "None" && len(ths.TagMapping[file]) == 0 {
-		return true, nil
+	// Doesn't have a Tag map or an empty Tag map
+	if ths.Mapping[file].Tags == nil || len(ths.Mapping[file].Tags) == 0 {
+		return tag == "None", nil
 	}
 
-	if _, ok := ths.TagMapping[file][tag]; ok {
+	if _, ok := ths.Mapping[file].Tags[tag]; ok {
 		return ok, nil
 	} else if expression, err := regexp.Compile("^(?i)" + strings.ReplaceAll(regexp.QuoteMeta(tag), "\\*", ".*") + "$"); err != nil {
 		return false, err
 	} else {
-		for tagOnFile := range ths.TagMapping[file] {
+		for tagOnFile := range ths.Mapping[file].Tags {
 			if expression.MatchString(tagOnFile) {
 				return true, nil
 			}
@@ -80,37 +94,67 @@ func (ths *TagFile) HasTag(file string, tag string) (bool, error) {
 	}
 }
 
-func (ths *TagFile) WriteTag(root string, file string, tag string) error {
-	if ths.TagMapping == nil {
-		ths.TagMapping = make(map[string]map[string]struct{})
-	}
-	if ths.TagMapping[file] == nil {
-		ths.TagMapping[file] = make(map[string]struct{})
+func (ths *TagTable) WriteTag(root string, file string, tag string) error {
+	if ths.Mapping == nil {
+		ths.Mapping = make(map[string]*TagFile)
 	}
 
-	if _, ok := ths.TagMapping[file][tag]; ok {
-		delete(ths.TagMapping[file], tag)
+	if _, ok := ths.Mapping[file]; !ok {
+		ths.Mapping[file] = &TagFile{
+			Tags: make(map[string]struct{}),
+		}
+	}
+
+	if _, ok := ths.Mapping[file].Tags[tag]; ok {
+		delete(ths.Mapping[file].Tags, tag)
 	} else {
-		ths.TagMapping[file][tag] = struct{}{}
+		ths.Mapping[file].Tags[tag] = struct{}{}
 	}
 
 	return ths.writeFile(root)
 }
 
-func (ths *TagFile) ScanImages(root string) error {
-	ths.ImageHashes = make(map[string]string)
-
-	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+func (ths *TagTable) scan(root string, f func(string, string)) error {
+	return filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+		file := strings.TrimPrefix(path, root)
 		if !info.IsDir() && info.Name() != ".tags.json" {
-			hasher := md5.New()
-			file, err := os.ReadFile(path)
-			if err != nil {
-				panic(err)
+			if _, ok := ths.Mapping[file]; !ok {
+				ths.Mapping[file] = &TagFile{
+					Tags: make(map[string]struct{}),
+				}
 			}
-			hasher.Write(file)
-			ths.ImageHashes[strings.TrimPrefix(path, root)] = hex.EncodeToString(hasher.Sum(nil))
+			f(file, path)
 		}
 		return nil
+	})
+}
+
+func (ths *TagTable) ScanMD5(root string, all bool) error {
+	err := ths.scan(root, func(file string, path string) {
+		if all || ths.Mapping[file].MD5 == "" {
+			if hash, err := md5Hash(path); err != nil {
+				panic(err)
+			} else {
+				ths.Mapping[file].MD5 = hash
+			}
+		}
+	})
+
+	if err != nil {
+		panic(err)
+	}
+	return ths.writeFile(root)
+}
+
+func (ths *TagTable) ScanAverage(root string, all bool) error {
+	err := ths.scan(root, func(file string, path string) {
+		if all || ths.Mapping[file].AHash == "" {
+			if hash, err := averageHash(path); err != nil {
+				panic(err)
+			} else {
+				ths.Mapping[file].AHash = hash
+			}
+		}
 	})
 
 	if err != nil {

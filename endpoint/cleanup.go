@@ -23,7 +23,7 @@ func (ths *Endpoints) Clean(w http.ResponseWriter, req *http.Request, ps httprou
 	data := CleanData{
 		RemovedImages: []string{},
 	}
-	for path := range tags.TagMapping {
+	for path := range tags.Mapping {
 		if _, err := os.Stat(filepath.Join(ths.Root, path)); err != nil {
 			data.RemovedImages = append(data.RemovedImages, path)
 		}

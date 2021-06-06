@@ -62,9 +62,9 @@ func (ths *Endpoints) CleanImages(w http.ResponseWriter, req *http.Request, ps h
 		panic(err.Error())
 	}
 
-	for path := range tags.TagMapping {
+	for path := range tags.Mapping {
 		if _, err := os.Stat(filepath.Join(ths.Root, path)); err != nil {
-			delete(tags.TagMapping, path)
+			delete(tags.Mapping, path)
 		}
 	}
 
@@ -72,14 +72,26 @@ func (ths *Endpoints) CleanImages(w http.ResponseWriter, req *http.Request, ps h
 }
 
 func (ths *Endpoints) ScanImages(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	shouldScanAll := false
+	overwriteArg := req.URL.Query().Get("overwrite")
+	if overwriteArg != "" {
+		shouldScanAll = true
+	}
+
 	tags, err := imagetag.New(ths.Root)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	err = tags.ScanImages(ths.Root)
+	err = tags.ScanMD5(ths.Root, shouldScanAll)
 	if err != nil {
 		panic(err)
 	}
+
+	err = tags.ScanAverage(ths.Root, shouldScanAll)
+	if err != nil {
+		panic(err)
+	}
+
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }

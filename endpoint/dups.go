@@ -11,7 +11,12 @@ import (
 )
 
 type DupData struct {
-	Duplicates [][]string
+	Duplicates []*Dup
+}
+
+type Dup struct {
+	Type   string
+	Images []string
 }
 
 func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -20,22 +25,43 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 		panic(err.Error())
 	}
 
-	hashset := make(map[string][]string)
-	dupHashes := []string{}
-	for image, hash := range tags.ImageHashes {
-		if _, ok := hashset[hash]; !ok {
-			hashset[hash] = []string{image}
-		} else {
-			dupHashes = append(dupHashes, hash)
-			hashset[hash] = append(hashset[hash], image)
+	md5set := make(map[string][]string)
+	ahashset := make(map[string][]string)
+	for image, imageData := range tags.Mapping {
+		if imageData.MD5 != "" {
+			if _, ok := md5set[imageData.MD5]; !ok {
+				md5set[imageData.MD5] = []string{image}
+			} else {
+				md5set[imageData.MD5] = append(md5set[imageData.MD5], image)
+			}
+		}
+		if imageData.AHash != "" {
+			if _, ok := ahashset[imageData.AHash]; !ok {
+				ahashset[imageData.AHash] = []string{image}
+			} else {
+				ahashset[imageData.AHash] = append(ahashset[imageData.AHash], image)
+			}
 		}
 	}
 
 	data := DupData{
-		Duplicates: [][]string{},
+		Duplicates: []*Dup{},
 	}
-	for _, hash := range dupHashes {
-		data.Duplicates = append(data.Duplicates, hashset[hash])
+	for _, images := range md5set {
+		if len(images) > 1 {
+			data.Duplicates = append(data.Duplicates, &Dup{
+				Type:   "MD5",
+				Images: images,
+			})
+		}
+	}
+	for _, images := range ahashset {
+		if len(images) > 1 {
+			data.Duplicates = append(data.Duplicates, &Dup{
+				Type:   "AverageHash",
+				Images: images,
+			})
+		}
 	}
 
 	var tagTemplate = template.New("Dups")
