@@ -70,3 +70,16 @@ func (ths *Endpoints) CleanImages(w http.ResponseWriter, req *http.Request, ps h
 
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }
+
+func (ths *Endpoints) ScanImages(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	tags, err := imagetag.New(ths.Root)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	err = tags.ScanImages(ths.Root)
+	if err != nil {
+		panic(err)
+	}
+	http.Redirect(w, req, req.Referer(), http.StatusFound)
+}

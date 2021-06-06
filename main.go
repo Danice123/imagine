@@ -19,8 +19,11 @@ func main() {
 	router.GET("/raw/*path", endpoints.RawImage)
 	router.GET("/browse/*path", endpoints.ImageView)
 	router.GET("/tags/*path", endpoints.TagView)
+	router.GET("/dups", endpoints.DupsView)
+
 	router.GET("/api/random", endpoints.ToggleRandom)
 	router.GET("/api/tag/*path", endpoints.ToggleTag)
+	router.GET("/api/scan", endpoints.ScanImages)
 	if err := http.ListenAndServe(os.Args[1], router); err != nil {
 		panic(err.Error())
 	}

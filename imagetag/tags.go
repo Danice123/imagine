@@ -1,7 +1,10 @@
 package imagetag
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -11,8 +14,9 @@ import (
 )
 
 type TagFile struct {
-	Tags       []string
-	TagMapping map[string]map[string]struct{}
+	Tags        []string
+	TagMapping  map[string]map[string]struct{}
+	ImageHashes map[string]string
 }
 
 func New(root string) (*TagFile, error) {
@@ -26,6 +30,17 @@ func New(root string) (*TagFile, error) {
 			return tagFile, nil
 		}
 	}
+}
+
+func (ths *TagFile) writeFile(root string) error {
+	if jsonData, err := json.MarshalIndent(ths, "", "\t"); err != nil {
+		return err
+	} else {
+		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, os.ModeAppend); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (ths *TagFile) ReadTags(file string) []imageinstance.Tag {
@@ -78,12 +93,30 @@ func (ths *TagFile) WriteTag(root string, file string, tag string) error {
 	} else {
 		ths.TagMapping[file][tag] = struct{}{}
 	}
-	if jsonData, err := json.MarshalIndent(ths, "", "\t"); err != nil {
-		return err
-	} else {
-		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, os.ModeAppend); err != nil {
-			return err
-		}
+
+	return ths.writeFile(root)
+}
+
+func (ths *TagFile) ScanImages(root string) error {
+	if ths.ImageHashes == nil {
+		ths.ImageHashes = make(map[string]string)
 	}
-	return nil
+
+	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+		if !info.IsDir() && info.Name() != ".tags.json" {
+			hasher := md5.New()
+			file, err := os.ReadFile(path)
+			if err != nil {
+				panic(err)
+			}
+			hasher.Write(file)
+			ths.ImageHashes[strings.TrimPrefix(path, root)] = hex.EncodeToString(hasher.Sum(nil))
+		}
+		return nil
+	})
+
+	if err != nil {
+		panic(err)
+	}
+	return ths.writeFile(root)
 }
