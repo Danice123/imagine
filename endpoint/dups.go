@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"text/template"
 
 	"github.com/Danice123/imagine/imagetag"
@@ -49,6 +50,7 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 	}
 	for _, images := range md5set {
 		if len(images) > 1 {
+			sort.Strings(images)
 			data.Duplicates = append(data.Duplicates, &Dup{
 				Type:   "MD5",
 				Images: images,
@@ -57,12 +59,17 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 	}
 	for _, images := range ahashset {
 		if len(images) > 1 {
+			sort.Strings(images)
 			data.Duplicates = append(data.Duplicates, &Dup{
 				Type:   "AverageHash",
 				Images: images,
 			})
 		}
 	}
+
+	sort.Slice(data.Duplicates, func(i, j int) bool {
+		return data.Duplicates[i].Images[0] < data.Duplicates[j].Images[0]
+	})
 
 	var tagTemplate = template.New("Dups")
 	if html, err := os.ReadFile(filepath.Join("templates", "dupview.html")); err != nil {
