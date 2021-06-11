@@ -27,7 +27,8 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 	}
 
 	md5set := make(map[string][]string)
-	ahashset := make(map[string][]string)
+	dhashset := make(map[string][]string)
+	phashset := make(map[string][]string)
 	for image, imageData := range tags.Mapping {
 		if imageData.MD5 != "" {
 			if _, ok := md5set[imageData.MD5]; !ok {
@@ -36,11 +37,18 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 				md5set[imageData.MD5] = append(md5set[imageData.MD5], image)
 			}
 		}
-		if imageData.AHash != "" {
-			if _, ok := ahashset[imageData.AHash]; !ok {
-				ahashset[imageData.AHash] = []string{image}
+		if imageData.DHash != "" {
+			if _, ok := dhashset[imageData.DHash]; !ok {
+				dhashset[imageData.DHash] = []string{image}
 			} else {
-				ahashset[imageData.AHash] = append(ahashset[imageData.AHash], image)
+				dhashset[imageData.DHash] = append(dhashset[imageData.DHash], image)
+			}
+		}
+		if imageData.PHash != "" {
+			if _, ok := phashset[imageData.PHash]; !ok {
+				phashset[imageData.PHash] = []string{image}
+			} else {
+				phashset[imageData.PHash] = append(phashset[imageData.PHash], image)
 			}
 		}
 	}
@@ -57,11 +65,20 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 			})
 		}
 	}
-	for _, images := range ahashset {
+	for _, images := range dhashset {
 		if len(images) > 1 {
 			sort.Strings(images)
 			data.Duplicates = append(data.Duplicates, &Dup{
-				Type:   "AverageHash",
+				Type:   "DifferenceHash",
+				Images: images,
+			})
+		}
+	}
+	for _, images := range phashset {
+		if len(images) > 1 {
+			sort.Strings(images)
+			data.Duplicates = append(data.Duplicates, &Dup{
+				Type:   "PerceptionHash",
 				Images: images,
 			})
 		}

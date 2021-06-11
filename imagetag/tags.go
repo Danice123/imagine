@@ -20,6 +20,8 @@ type TagFile struct {
 	Tags  map[string]struct{}
 	MD5   string
 	AHash string
+	DHash string
+	PHash string
 }
 
 func New(root string) (*TagTable, error) {
@@ -35,7 +37,7 @@ func New(root string) (*TagTable, error) {
 	}
 }
 
-func (ths *TagTable) writeFile(root string) error {
+func (ths *TagTable) WriteFile(root string) error {
 	if jsonData, err := json.MarshalIndent(ths, "", "\t"); err != nil {
 		return err
 	} else {
@@ -105,16 +107,22 @@ func (ths *TagTable) WriteTag(root string, file string, tag string) error {
 		ths.Mapping[file].Tags[tag] = struct{}{}
 	}
 
-	return ths.writeFile(root)
+	return ths.WriteFile(root)
 }
 
 func (ths *TagTable) DeleteFile(root string, file string) error {
 	delete(ths.Mapping, file)
-	return ths.writeFile(root)
+	return ths.WriteFile(root)
 }
 
-func (ths *TagTable) scan(root string, f func(string, string)) error {
-	return filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+type FilePath struct {
+	File string
+	Path string
+}
+
+func (ths *TagTable) Scan(root string) []FilePath {
+	files := []FilePath{}
+	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
 		file := strings.TrimPrefix(path, root)
 		if !info.IsDir() && info.Name() != ".tags.json" {
 			if _, ok := ths.Mapping[file]; !ok {
@@ -122,42 +130,15 @@ func (ths *TagTable) scan(root string, f func(string, string)) error {
 					Tags: make(map[string]struct{}),
 				}
 			}
-			f(file, path)
+			files = append(files, FilePath{
+				File: file,
+				Path: path,
+			})
 		}
 		return nil
 	})
-}
-
-func (ths *TagTable) ScanMD5(root string, all bool) error {
-	err := ths.scan(root, func(file string, path string) {
-		if all || ths.Mapping[file].MD5 == "" {
-			if hash, err := md5Hash(path); err != nil {
-				panic(err)
-			} else {
-				ths.Mapping[file].MD5 = hash
-			}
-		}
-	})
-
 	if err != nil {
 		panic(err)
 	}
-	return ths.writeFile(root)
-}
-
-func (ths *TagTable) ScanAverage(root string, all bool) error {
-	err := ths.scan(root, func(file string, path string) {
-		if all || ths.Mapping[file].AHash == "" {
-			if hash, err := averageHash(path); err != nil {
-				panic(err)
-			} else {
-				ths.Mapping[file].AHash = hash
-			}
-		}
-	})
-
-	if err != nil {
-		panic(err)
-	}
-	return ths.writeFile(root)
+	return files
 }
