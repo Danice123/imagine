@@ -23,7 +23,9 @@ func main() {
 	router.GET("/dups", endpoints.DupsView)
 
 	router.GET("/api/random", endpoints.ToggleRandom)
+	router.GET("/api/browsingmood", endpoints.SetBrowsingMood)
 	router.GET("/api/tag/*path", endpoints.ToggleTag)
+	router.GET("/api/mood/*path", endpoints.SetImageMood)
 	router.GET("/api/clean", endpoints.CleanImages)
 	router.GET("/api/trash/*path", endpoints.TrashImage)
 	router.GET("/api/scan", func(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {

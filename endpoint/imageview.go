@@ -25,6 +25,7 @@ type ImageData struct {
 	Image       *imageinstance.ImageInstance
 	ShowTags    bool
 	Tags        []imageinstance.Tag
+	Mood        string
 }
 
 func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -56,6 +57,7 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 		panic(err.Error())
 	} else {
 		data.Tags = tags.ReadTags(ps.ByName("path"))
+		data.Mood = tags.Mapping[ps.ByName("path")].Mood
 	}
 
 	var iterator *imagedir.ImageDirIterator
@@ -65,19 +67,38 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 		iterator = imagedir.New(targetImage.BaseDir(), ps.ByName("path"), imagedir.SortByName)
 	}
 
-	filter := func(string) bool {
-		return false
-	}
+	filters := []func(string) bool{}
 
 	if req.URL.Query().Get("filter") != "" {
-		filter = func(name string) bool {
+		filters = append(filters, func(name string) bool {
 			imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), ths.Root), "\\", "/")
 			if ok, err := tags.HasTag(imageName, req.URL.Query().Get("filter")); err != nil {
 				return false
 			} else {
 				return !ok
 			}
+		})
+	}
+
+	if cookie, err := req.Cookie("mood"); err == nil {
+		if cookie.Value != "" && req.URL.Query().Get("tags") == "" {
+			filters = append(filters, func(name string) bool {
+				imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), ths.Root), "\\", "/")
+				if image, ok := tags.Mapping[imageName]; ok {
+					return image.Mood != cookie.Value
+				}
+				return true
+			})
 		}
+	}
+
+	filter := func(name string) bool {
+		for _, f := range filters {
+			if f(name) {
+				return true
+			}
+		}
+		return false
 	}
 
 	if targetImage.IsDir {
