@@ -5,11 +5,13 @@
     </head>
     <body>
         <h1>{{.Name}}</h1>
-        <ul>
+        <ul class="list-group">
             {{range .Folders}}
-                <li>
-                    <a href="tags{{.}}">{{.}}</a>
-                </li>
+                <a href="tags{{.}}">
+                    <li class="list-group-item">
+                        <span class="h3">{{.}}</span>
+                    </li>
+                </a>
             {{end}}
         </ul>
     </body>

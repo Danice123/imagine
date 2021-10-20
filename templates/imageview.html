@@ -9,7 +9,7 @@
 				right: 0px;
 				bottom: 0px;
 				left: 0px;
-				max-height: 100%;
+				height: 100%;
 				max-width: 100%;
 				margin: auto;
 			}
@@ -20,8 +20,9 @@
 				right: 0px;
 				bottom: 0px;
 				left: 0px;
-				max-height: 100%;
+				height: 100%;
 				max-width: 100%;
+				object-fit: contain;
 				margin: auto;
 			}
 
@@ -93,6 +94,14 @@
 					break;
 				}
 			})
+		</script>
+		<script>
+			const urlParams = new URLSearchParams(window.location.search);
+			if (urlParams.get("timer") != null) {
+				setTimeout(function() {
+					window.location.href = "{{.Next}}?{{.QueryString}}"
+				}, urlParams.get("timer"))
+			}
 		</script>
 	</body>
 </html>
