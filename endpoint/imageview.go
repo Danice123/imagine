@@ -55,9 +55,6 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 	tags, err := imagetag.New(ths.Root)
 	if err != nil {
 		panic(err.Error())
-	} else {
-		data.Tags = tags.ReadTags(ps.ByName("path"))
-		data.Mood = tags.Mapping[ps.ByName("path")].Mood
 	}
 
 	var iterator *imagedir.ImageDirIterator
@@ -107,6 +104,8 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 		return
 	}
 
+	data.Tags = tags.ReadTags(ps.ByName("path"))
+	data.Mood = tags.Mapping[ps.ByName("path")].Mood
 	data.Next = iterator.FindNextFile(1, filter)
 	data.Previous = iterator.FindNextFile(-1, filter)
 
