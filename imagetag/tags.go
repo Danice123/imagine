@@ -111,6 +111,13 @@ func (ths *TagTable) WriteTag(root string, file string, tag string) error {
 	return ths.WriteFile(root)
 }
 
+func (ths *TagTable) ReadMood(file string) string {
+	if _, ok := ths.Mapping[file]; ok {
+		return ths.Mapping[file].Mood
+	}
+	return ""
+}
+
 func (ths *TagTable) SetMood(root string, file string, mood string) error {
 	if ths.Mapping == nil {
 		ths.Mapping = make(map[string]*TagFile)

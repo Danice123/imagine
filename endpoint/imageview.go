@@ -105,7 +105,7 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 	}
 
 	data.Tags = tags.ReadTags(ps.ByName("path"))
-	data.Mood = tags.Mapping[ps.ByName("path")].Mood
+	data.Mood = tags.ReadMood(ps.ByName("path"))
 	data.Next = iterator.FindNextFile(1, filter)
 	data.Previous = iterator.FindNextFile(-1, filter)
 
