@@ -1,0 +1,100 @@
+body {
+  background-color: black;
+  text-align: center;
+}
+
+video {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  height: 100%;
+  max-width: 100%;
+  margin: auto;
+}
+
+img {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  margin: auto;
+}
+
+svg {
+  fill: white;
+}
+
+#previous_button {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  z-index: 2147483600;
+}
+
+#previous_button svg {
+  height: 104px;
+  width: 77px;
+}
+
+#next_button {
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  z-index: 2147483600;
+}
+
+#next_button svg {
+  height: 20px;
+  width: 20px;
+}
+
+#next {
+  float: right;
+}
+
+#next svg {
+  height: 104px;
+  width: 77px;
+}
+
+.adds {
+  display: none;
+}
+
+#next_button:hover .adds {
+  display: inline;
+}
+
+.random_on_true {
+  fill: green;
+}
+
+.random_on_false {
+  fill: red;
+}
+
+#mood_box {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  z-index: 2147483600;
+}
+
+#mood_box svg {
+  height: 40px;
+}
+
+#tags {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 2147483600;
+  flex-wrap: wrap;
+  height: 80%;
+}

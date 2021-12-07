@@ -32,6 +32,9 @@ func main() {
 		websocket.Handler(endpoints.Scan).ServeHTTP(rw, r)
 	})
 
+	static := http.FileServer(http.Dir("./templates/static"))
+	router.Handler("GET", "/static/*path", http.StripPrefix("/static/", static))
+
 	if err := http.ListenAndServe(os.Args[1], router); err != nil {
 		panic(err.Error())
 	}
