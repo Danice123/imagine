@@ -76,13 +76,21 @@
 		</div>
 
 		<div style="position: fixed; top: 0px; right: 0px; z-index: 2147483600;">
-			<a style="fill: white;" href={{if .ShowTags}}"/api/mood{{$.Url}}?mood="{{else}}"/api/browsingmood"{{end}}>
+			{{if .ShowTags}}
+			<a style="fill: white;" href="/api/mood{{$.Url}}?mood=">
+				{{else}}
+			<a style="fill: white;" href="/api/browsingmood">
+				{{end}}
 				<svg  height="40px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 490 490" style="enable-background:new 0 0 490 490;" xml:space="preserve">
 					<polygon points="11.387,490 245,255.832 478.613,490 489.439,479.174 255.809,244.996 489.439,10.811 478.613,0 245,234.161 
 						11.387,0 0.561,10.811 234.191,244.996 0.561,479.174 "/>
 				</svg>
 			</a>
-			<a id="cold" style="fill: white;" href={{if .ShowTags}}"/api/mood{{$.Url}}?mood=cold"{{else}}"/api/browsingmood?mood=cold"{{end}}>
+				{{if .ShowTags}}
+				<a id="cold" style="fill: white;" href="/api/mood{{$.Url}}?mood=cold">
+					{{else}}
+				<a id="cold" style="fill: white;" href="/api/browsingmood?mood=cold">
+					{{end}}
 				<svg height="40px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">
 					<g id="Eye">
 						<path d="M3.6387,26.5303001c0.1738,0,0.3506-0.0449009,0.5107002-0.1406994
@@ -113,7 +121,11 @@
 					</g>
 				</svg>
 			</a>
-			<a id="warm" style="fill: white;" href={{if .ShowTags}}"/api/mood{{$.Url}}?mood=warm"{{else}}"/api/browsingmood?mood=warm"{{end}}>
+			{{if .ShowTags}}
+				<a id="warm" style="fill: white;" href="/api/mood{{$.Url}}?mood=warm">
+					{{else}}
+				<a id="warm" style="fill: white;" href="/api/browsingmood?mood=warm">
+					{{end}}
 				<svg height="40px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 490.4 490.4" style="enable-background:new 0 0 490.4 490.4;" xml:space="preserve">
 					<g>
 						<g>
@@ -127,7 +139,11 @@
 					</g>
 				</svg>
 			</a>
-			<a id="hot" style="fill: white;" href={{if .ShowTags}}"/api/mood{{$.Url}}?mood=hot"{{else}}"/api/browsingmood?mood=hot"{{end}}>
+			{{if .ShowTags}}
+				<a id="hot" style="fill: white;" href="/api/mood{{$.Url}}?mood=hot">
+					{{else}}
+				<a id="hot" style="fill: white;" href="/api/browsingmood?mood=hot">
+					{{end}}
 				<svg height="40px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.071 55.071" style="enable-background:new 0 0 55.071 55.071;" xml:space="preserve">
 					<g>
 						<path d="M26.998,32.88c2.928-2.927,4.54-6.819,4.54-10.96c0-4.14-1.612-8.032-4.54-10.96L16.038,0L5.078,10.96
