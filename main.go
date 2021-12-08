@@ -21,6 +21,7 @@ func main() {
 	router.GET("/browse/*path", endpoints.ImageView)
 	router.GET("/tags/*path", endpoints.TagView)
 	router.GET("/dups", endpoints.DupsView)
+	router.GET("/dupcompare", endpoints.DupCompare)
 
 	router.GET("/api/random", endpoints.ToggleRandom)
 	router.GET("/api/browsingmood", endpoints.SetBrowsingMood)
@@ -31,6 +32,7 @@ func main() {
 	router.GET("/api/scan", func(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		websocket.Handler(endpoints.Scan).ServeHTTP(rw, r)
 	})
+	router.GET("/api/markasnotdup", endpoints.MarkAsNotDup)
 
 	static := http.FileServer(http.Dir("./templates/static"))
 	router.Handler("GET", "/static/*path", http.StripPrefix("/static/", static))

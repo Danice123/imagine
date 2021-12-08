@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"text/template"
 
@@ -17,6 +18,7 @@ type DupData struct {
 
 type Dup struct {
 	Type   string
+	Hash   string
 	Images []string
 }
 
@@ -56,29 +58,51 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 	data := DupData{
 		Duplicates: []*Dup{},
 	}
-	for _, images := range md5set {
+	for hash, images := range md5set {
 		if len(images) > 1 {
 			sort.Strings(images)
+			if checked, ok := tags.HashDups[hash]; ok {
+				sort.Strings(checked)
+				if reflect.DeepEqual(checked, images) {
+					continue
+				}
+			}
+
 			data.Duplicates = append(data.Duplicates, &Dup{
 				Type:   "MD5",
+				Hash:   hash,
 				Images: images,
 			})
 		}
 	}
-	for _, images := range dhashset {
+	for hash, images := range dhashset {
 		if len(images) > 1 {
 			sort.Strings(images)
+			if checked, ok := tags.HashDups[hash]; ok {
+				sort.Strings(checked)
+				if reflect.DeepEqual(checked, images) {
+					continue
+				}
+			}
 			data.Duplicates = append(data.Duplicates, &Dup{
 				Type:   "DifferenceHash",
+				Hash:   hash,
 				Images: images,
 			})
 		}
 	}
-	for _, images := range phashset {
+	for hash, images := range phashset {
 		if len(images) > 1 {
 			sort.Strings(images)
+			if checked, ok := tags.HashDups[hash]; ok {
+				sort.Strings(checked)
+				if reflect.DeepEqual(checked, images) {
+					continue
+				}
+			}
 			data.Duplicates = append(data.Duplicates, &Dup{
 				Type:   "PerceptionHash",
+				Hash:   hash,
 				Images: images,
 			})
 		}

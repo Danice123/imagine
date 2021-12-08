@@ -93,9 +93,11 @@
     <ul>
       {{ range .Duplicates }}
         <li>
-          <b>{{ .Type }}:</b>
+          <a href="/dupcompare?hash={{ .Hash }}&type={{ .Type }}"
+            ><b>{{ .Type }}:</b></a
+          >
           {{ range .Images }}
-            <a href="/api/trash{{ . }}">{{ . }}</a>,
+            {{ . }},
           {{ end }}
         </li>
       {{ end }}

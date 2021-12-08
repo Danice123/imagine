@@ -9,7 +9,7 @@
     />
   </head>
   <body>
-    <h1>{{ .Name }}</h1>
+    <h1>Browse</h1>
     <ul class="list-group">
       {{ range .Folders }}
         <a href="tags{{ . }}">
@@ -19,5 +19,7 @@
         </a>
       {{ end }}
     </ul>
+    <h1>Utilities</h1>
+    <a class="h3" href="/dups">Duplicate Runtimes</a>
   </body>
 </html>

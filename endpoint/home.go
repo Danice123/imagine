@@ -33,7 +33,6 @@ func (ths *Endpoints) Home(w http.ResponseWriter, req *http.Request, ps httprout
 			panic(err.Error())
 		} else {
 			homeTemplate.Execute(w, HomeData{
-				Name:    filepath.Base(ths.Root),
 				Folders: folders,
 			})
 		}

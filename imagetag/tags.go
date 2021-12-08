@@ -12,8 +12,9 @@ import (
 )
 
 type TagTable struct {
-	Tags    []string
-	Mapping map[string]*TagFile
+	Tags     []string
+	Mapping  map[string]*TagFile
+	HashDups map[string][]string
 }
 
 type TagFile struct {
@@ -135,6 +136,15 @@ func (ths *TagTable) SetMood(root string, file string, mood string) error {
 
 func (ths *TagTable) DeleteFile(root string, file string) error {
 	delete(ths.Mapping, file)
+	return ths.WriteFile(root)
+}
+
+func (ths *TagTable) SetDupList(root string, hash string, images []string) error {
+	if ths.HashDups == nil {
+		ths.HashDups = make(map[string][]string)
+	}
+
+	ths.HashDups[hash] = images
 	return ths.WriteFile(root)
 }
 
