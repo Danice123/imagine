@@ -9,13 +9,14 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/corona10/goimagehash"
 )
 
-func MD5Hash(path string) (string, error) {
+func MD5Hash(root string, path string) (string, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
@@ -26,7 +27,7 @@ func MD5Hash(path string) (string, error) {
 	return hex.EncodeToString(hasher.Sum(nil)), nil
 }
 
-func DifferenceHash(path string) (string, error) {
+func DifferenceHash(root string, path string) (string, error) {
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".png":
 	case ".jpg":
@@ -52,13 +53,16 @@ func DifferenceHash(path string) (string, error) {
 	}
 }
 
-func PerceptionHash(path string) (string, error) {
+func PerceptionHash(root string, path string) (string, error) {
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".png":
 	case ".jpg":
 	case ".jpeg":
-	case ".gif":
 		break
+	case ".gif":
+	case ".mp4":
+	case ".webm":
+		path = ExtractFrame(root, path, filepath.Base(path))
 	default:
 		return "", nil
 	}
@@ -76,4 +80,26 @@ func PerceptionHash(path string) (string, error) {
 			}
 		}
 	}
+}
+
+func ExtractFrame(root string, path string, name string) string {
+	tempDir := filepath.Join(root, "temp")
+	if _, err := os.Stat(tempDir); err != nil {
+		os.Mkdir(tempDir, os.FileMode(int(0777)))
+	}
+
+	output := filepath.Join(root, "temp", name+".png")
+	cmd := exec.Command("ffmpeg",
+		"-i", path,
+		"-frames", "1",
+		output)
+
+	if err := cmd.Start(); err != nil {
+		panic(err)
+	}
+	if err := cmd.Wait(); err != nil {
+		panic(err.Error())
+	}
+
+	return output
 }

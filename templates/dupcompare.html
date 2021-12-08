@@ -17,7 +17,10 @@
       {{ range .Images }}
         <div style="width: 50%;">
           <a class="h4" href="/api/trash{{ . }}">{{ . }}</a>
-          <img src="/raw{{ . }}" style="width: 100%;" />
+          <!-- <img src="/raw{{ . }}" style="width: 100%;" /> -->
+          <video autoplay loop>
+            <source src="/raw{{ . }}" />
+          </video>
         </div>
       {{ end }}
     </div>

@@ -1,6 +1,8 @@
 package endpoint
 
 import (
+	"path/filepath"
+
 	"github.com/Danice123/imagine/imagetag"
 	"golang.org/x/net/websocket"
 )
@@ -26,7 +28,7 @@ func (ths *Endpoints) Scan(conn *websocket.Conn) {
 		panic(err.Error())
 	}
 
-	var hashFunc func(string) (string, error)
+	var hashFunc func(string, string) (string, error)
 	var checkHash func(string) bool
 	var writeHash func(string, string)
 	switch req.ScanType {
@@ -61,8 +63,11 @@ func (ths *Endpoints) Scan(conn *websocket.Conn) {
 
 	files := tags.Scan(ths.Root)
 	for i := 0; i < len(files); i++ {
+		if filepath.Dir(files[i].Path) == filepath.Join(ths.Root, "temp") || filepath.Dir(files[i].Path) == filepath.Join(ths.Root, "trash") {
+			continue
+		}
 		if req.ScanAll || checkHash(files[i].File) {
-			if hash, err := hashFunc(files[i].Path); err != nil {
+			if hash, err := hashFunc(ths.Root, files[i].Path); err != nil {
 				panic(err)
 			} else {
 				writeHash(files[i].File, hash)
@@ -77,6 +82,10 @@ func (ths *Endpoints) Scan(conn *websocket.Conn) {
 			Total:    len(files),
 		})
 	}
+	websocket.JSON.Send(conn, &Scanprogress{
+		Progress: len(files),
+		Total:    len(files),
+	})
 	tags.WriteFile(ths.Root)
 	conn.Close()
 }
