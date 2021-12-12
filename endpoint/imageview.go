@@ -15,6 +15,33 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+type Filter interface {
+	IsValid(*imagetag.TagTable, string) bool
+}
+
+type TagFilter struct {
+	Tag string
+}
+
+func (ths *TagFilter) IsValid(tags *imagetag.TagTable, name string) bool {
+	if ok, err := tags.HasTag(name, ths.Tag); err != nil {
+		return true
+	} else {
+		return ok
+	}
+}
+
+type MoodFilter struct {
+	Mood string
+}
+
+func (ths *MoodFilter) IsValid(tags *imagetag.TagTable, name string) bool {
+	if image, ok := tags.Mapping[name]; ok {
+		return image.Mood == ths.Mood
+	}
+	return false
+}
+
 type ImageData struct {
 	Url         string
 	Path        string
@@ -64,38 +91,34 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 		iterator = imagedir.New(targetImage.BaseDir(), ps.ByName("path"), imagedir.SortByName)
 	}
 
-	filters := []func(string) bool{}
+	filters := []Filter{}
 
-	if req.URL.Query().Get("filter") != "" {
-		filters = append(filters, func(name string) bool {
-			imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), ths.Root), "\\", "/")
-			if ok, err := tags.HasTag(imageName, req.URL.Query().Get("filter")); err != nil {
-				return false
-			} else {
-				return !ok
-			}
-		})
+	query := req.URL.Query()
+	if query.Get("filter") != "" {
+		for _, filter := range query["filter"] {
+			filters = append(filters, &TagFilter{
+				Tag: filter,
+			})
+		}
 	}
 
 	if cookie, err := req.Cookie("mood"); err == nil {
-		if cookie.Value != "" && req.URL.Query().Get("tags") == "" {
-			filters = append(filters, func(name string) bool {
-				imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), ths.Root), "\\", "/")
-				if image, ok := tags.Mapping[imageName]; ok {
-					return image.Mood != cookie.Value
-				}
-				return true
+		if cookie.Value != "" && query.Get("tags") == "" {
+			filters = append(filters, &MoodFilter{
+				Mood: cookie.Value,
 			})
 		}
 	}
 
 	filter := func(name string) bool {
+		imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), ths.Root), "\\", "/")
+		shouldFilter := false
 		for _, f := range filters {
-			if f(name) {
-				return true
+			if !f.IsValid(tags, imageName) {
+				shouldFilter = true
 			}
 		}
-		return false
+		return shouldFilter
 	}
 
 	if targetImage.IsDir {
