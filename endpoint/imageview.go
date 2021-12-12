@@ -56,12 +56,19 @@ type ImageData struct {
 }
 
 func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	query := req.URL.Query()
+
+	isEditing := false
+	if cookie, err := req.Cookie("editing"); err == nil {
+		isEditing = cookie.Value == "true"
+	}
+
 	data := &ImageData{
 		Url:         ps.ByName("path"),
 		Path:        filepath.Dir(ps.ByName("path")),
 		RandomState: false,
-		QueryString: req.URL.Query().Encode(),
-		ShowTags:    req.URL.Query().Get("tags") != "",
+		QueryString: query.Encode(),
+		ShowTags:    isEditing,
 	}
 
 	isRandom := false
@@ -93,7 +100,6 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 
 	filters := []Filter{}
 
-	query := req.URL.Query()
 	if query.Get("filter") != "" {
 		for _, filter := range query["filter"] {
 			filters = append(filters, &TagFilter{
@@ -103,7 +109,7 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 	}
 
 	if cookie, err := req.Cookie("mood"); err == nil {
-		if cookie.Value != "" && query.Get("tags") == "" {
+		if cookie.Value != "" && !isEditing {
 			filters = append(filters, &MoodFilter{
 				Mood: cookie.Value,
 			})

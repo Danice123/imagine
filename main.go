@@ -24,6 +24,7 @@ func main() {
 	router.GET("/dupcompare", endpoints.DupCompare)
 
 	router.GET("/api/random", endpoints.ToggleRandom)
+	router.GET("/api/editing", endpoints.ToggleEditing)
 	router.GET("/api/browsingmood", endpoints.SetBrowsingMood)
 	router.GET("/api/tag/*path", endpoints.ToggleTag)
 	router.GET("/api/mood/*path", endpoints.SetImageMood)

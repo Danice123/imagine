@@ -30,6 +30,24 @@ func (ths *Endpoints) ToggleRandom(w http.ResponseWriter, req *http.Request, ps 
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }
 
+func (ths *Endpoints) ToggleEditing(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	if _, err := req.Cookie("editing"); err == nil {
+		http.SetCookie(w, &http.Cookie{
+			Name:   "editing",
+			Value:  "",
+			Path:   "/",
+			MaxAge: -1,
+		})
+	} else {
+		http.SetCookie(w, &http.Cookie{
+			Name:  "editing",
+			Value: "true",
+			Path:  "/",
+		})
+	}
+	http.Redirect(w, req, req.Referer(), http.StatusFound)
+}
+
 func (ths *Endpoints) SetBrowsingMood(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	http.SetCookie(w, &http.Cookie{
 		Name:  "mood",
