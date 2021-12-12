@@ -29,7 +29,6 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 	}
 
 	md5set := make(map[string][]string)
-	dhashset := make(map[string][]string)
 	phashset := make(map[string][]string)
 	for image, imageData := range tags.Mapping {
 		if imageData.MD5 != "" {
@@ -37,13 +36,6 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 				md5set[imageData.MD5] = []string{image}
 			} else {
 				md5set[imageData.MD5] = append(md5set[imageData.MD5], image)
-			}
-		}
-		if imageData.DHash != "" {
-			if _, ok := dhashset[imageData.DHash]; !ok {
-				dhashset[imageData.DHash] = []string{image}
-			} else {
-				dhashset[imageData.DHash] = append(dhashset[imageData.DHash], image)
 			}
 		}
 		if imageData.PHash != "" {
@@ -70,22 +62,6 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 
 			data.Duplicates = append(data.Duplicates, &Dup{
 				Type:   "MD5",
-				Hash:   hash,
-				Images: images,
-			})
-		}
-	}
-	for hash, images := range dhashset {
-		if len(images) > 1 {
-			sort.Strings(images)
-			if checked, ok := tags.HashDups[hash]; ok {
-				sort.Strings(checked)
-				if reflect.DeepEqual(checked, images) {
-					continue
-				}
-			}
-			data.Duplicates = append(data.Duplicates, &Dup{
-				Type:   "DifferenceHash",
 				Hash:   hash,
 				Images: images,
 			})

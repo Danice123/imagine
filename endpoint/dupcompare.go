@@ -32,8 +32,6 @@ func (ths *Endpoints) DupCompare(w http.ResponseWriter, req *http.Request, ps ht
 	for image, imageData := range tags.Mapping {
 		if params.Get("type") == "MD5" && imageData.MD5 == params.Get("hash") {
 			images = append(images, image)
-		} else if params.Get("type") == "DifferenceHash" && imageData.DHash == params.Get("hash") {
-			images = append(images, image)
 		} else if params.Get("type") == "PerceptionHash" && imageData.PHash == params.Get("hash") {
 			images = append(images, image)
 		}
@@ -70,8 +68,6 @@ func (ths *Endpoints) MarkAsNotDup(w http.ResponseWriter, req *http.Request, ps 
 	images := []string{}
 	for image, imageData := range tags.Mapping {
 		if params.Get("type") == "MD5" && imageData.MD5 == params.Get("hash") {
-			images = append(images, image)
-		} else if params.Get("type") == "DifferenceHash" && imageData.DHash == params.Get("hash") {
 			images = append(images, image)
 		} else if params.Get("type") == "PerceptionHash" && imageData.PHash == params.Get("hash") {
 			images = append(images, image)

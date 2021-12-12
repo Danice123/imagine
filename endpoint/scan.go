@@ -40,14 +40,6 @@ func (ths *Endpoints) Scan(conn *websocket.Conn) {
 		writeHash = func(file string, hash string) {
 			tags.Mapping[file].MD5 = hash
 		}
-	case "dhash":
-		hashFunc = imagetag.DifferenceHash
-		checkHash = func(file string) bool {
-			return tags.Mapping[file].DHash == ""
-		}
-		writeHash = func(file string, hash string) {
-			tags.Mapping[file].DHash = hash
-		}
 	case "phash":
 		hashFunc = imagetag.PerceptionHash
 		checkHash = func(file string) bool {

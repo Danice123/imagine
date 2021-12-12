@@ -27,32 +27,6 @@ func MD5Hash(root string, path string) (string, error) {
 	return hex.EncodeToString(hasher.Sum(nil)), nil
 }
 
-func DifferenceHash(root string, path string) (string, error) {
-	switch strings.ToLower(filepath.Ext(path)) {
-	case ".png":
-	case ".jpg":
-	case ".jpeg":
-	case ".gif":
-		break
-	default:
-		return "", nil
-	}
-
-	if file, err := os.Open(path); err != nil {
-		return "", err
-	} else {
-		if img, _, err := image.Decode(file); err != nil {
-			return "", err
-		} else {
-			if hash, err := goimagehash.DifferenceHash(img); err != nil {
-				return "", err
-			} else {
-				return fmt.Sprintf("%d", hash.GetHash()), nil
-			}
-		}
-	}
-}
-
 func PerceptionHash(root string, path string) (string, error) {
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".png":

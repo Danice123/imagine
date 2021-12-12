@@ -21,8 +21,6 @@ type TagFile struct {
 	Tags  map[string]struct{}
 	Mood  string
 	MD5   string
-	AHash string
-	DHash string
 	PHash string
 }
 
