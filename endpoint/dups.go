@@ -1,14 +1,17 @@
 package endpoint
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"reflect"
 	"sort"
+	"strconv"
 	"text/template"
 
 	"github.com/Danice123/imagine/imagetag"
+	"github.com/corona10/goimagehash"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -29,7 +32,8 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 	}
 
 	md5set := make(map[string][]string)
-	phashset := make(map[string][]string)
+	phashlist := []*goimagehash.ImageHash{}
+	phashset := make(map[uint64][]string)
 	for image, imageData := range tags.Mapping {
 		if imageData.MD5 != "" {
 			if _, ok := md5set[imageData.MD5]; !ok {
@@ -39,10 +43,27 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 			}
 		}
 		if imageData.PHash != "" {
-			if _, ok := phashset[imageData.PHash]; !ok {
-				phashset[imageData.PHash] = []string{image}
-			} else {
-				phashset[imageData.PHash] = append(phashset[imageData.PHash], image)
+			hashbits, err := strconv.ParseUint(imageData.PHash, 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			hash := goimagehash.NewImageHash(hashbits, goimagehash.PHash)
+			phashlist = append(phashlist, hash)
+
+			foundMatch := false
+			for _, hashsearch := range phashlist {
+				distance, err := hash.Distance(hashsearch)
+				if err != nil {
+					panic(err)
+				}
+				if distance <= 1 {
+					phashset[hashsearch.GetHash()] = append(phashset[hash.GetHash()], image)
+					foundMatch = true
+				}
+			}
+
+			if !foundMatch {
+				phashset[hash.GetHash()] = []string{image}
 			}
 		}
 	}
@@ -70,7 +91,7 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 	for hash, images := range phashset {
 		if len(images) > 1 {
 			sort.Strings(images)
-			if checked, ok := tags.HashDups[hash]; ok {
+			if checked, ok := tags.HashDups[fmt.Sprintf("%d", hash)]; ok {
 				sort.Strings(checked)
 				if reflect.DeepEqual(checked, images) {
 					continue
@@ -78,7 +99,7 @@ func (ths *Endpoints) DupsView(w http.ResponseWriter, req *http.Request, ps http
 			}
 			data.Duplicates = append(data.Duplicates, &Dup{
 				Type:   "PerceptionHash",
-				Hash:   hash,
+				Hash:   fmt.Sprintf("%d", hash),
 				Images: images,
 			})
 		}
