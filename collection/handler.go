@@ -52,7 +52,7 @@ func (ths *CollectionHandler) Image(path string) *Image {
 
 func (ths *CollectionHandler) HashCache() *HashCache {
 	if ths.hc == nil {
-		ths.hc = &HashCache{path: filepath.Join(ths.rootDirectory, ".hashcache.json")}
+		ths.hc = &HashCache{path: filepath.Join(ths.rootDirectory, ".hashcache.json"), hashFunc: ths.MD5Hash}
 		ths.hc.Load()
 	}
 	return ths.hc

@@ -21,7 +21,7 @@ func (ths *TagHandler) Get(image *Image) []Tag {
 	tags := []Tag{}
 	for _, tag := range ths.Tags {
 		isValid := false
-		if data := ths.hd.Data(ths.hc.Hash(image.RelativePath)); data != nil {
+		if data := ths.hd.Data(ths.hc.Hash(image)); data != nil {
 			if _, ok := data.Tags[tag]; ok {
 				isValid = true
 			}
@@ -35,7 +35,7 @@ func (ths *TagHandler) Get(image *Image) []Tag {
 }
 
 func (ths *TagHandler) HasTag(image *Image, tag string) (bool, error) {
-	if data := ths.hd.Data(ths.hc.Hash(image.RelativePath)); data != nil {
+	if data := ths.hd.Data(ths.hc.Hash(image)); data != nil {
 		if _, ok := data.Tags[tag]; ok {
 			return true, nil
 		} else if expression, err := regexp.Compile("^(?i)" + strings.ReplaceAll(regexp.QuoteMeta(tag), "\\*", ".*") + "$"); err != nil {
@@ -52,9 +52,9 @@ func (ths *TagHandler) HasTag(image *Image, tag string) (bool, error) {
 }
 
 func (ths *TagHandler) WriteTag(image *Image, tag string) {
-	data := ths.hd.Data(ths.hc.Hash(image.RelativePath))
+	data := ths.hd.Data(ths.hc.Hash(image))
 	if data == nil {
-		data = ths.hd.CreateData(ths.hc.Hash(image.RelativePath))
+		data = ths.hd.CreateData(ths.hc.Hash(image))
 	}
 
 	if _, ok := data.Tags[tag]; ok {

@@ -8,7 +8,8 @@ import (
 type HashCache struct {
 	data *map[string]string
 
-	path string
+	path     string
+	hashFunc func(*Image) (string, error)
 }
 
 func (ths *HashCache) Load() {
@@ -32,12 +33,20 @@ func (ths *HashCache) Save() {
 	}
 }
 
-func (ths *HashCache) Hash(image string) string {
-	return (*ths.data)[image]
+func (ths *HashCache) Hash(image *Image) string {
+	if (*ths.data)[image.RelativePath] == "" {
+		newHash, err := ths.hashFunc(image)
+		if err != nil {
+			panic(err)
+		}
+		(*ths.data)[image.RelativePath] = newHash
+	}
+
+	return (*ths.data)[image.RelativePath]
 }
 
-func (ths *HashCache) PutHash(image string, hash string) {
-	(*ths.data)[image] = hash
+func (ths *HashCache) PutHash(image *Image, hash string) {
+	(*ths.data)[image.RelativePath] = hash
 }
 
 func (ths *HashCache) GetDups() map[string][]string {
