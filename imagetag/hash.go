@@ -65,6 +65,7 @@ func ExtractFrame(root string, path string, name string) string {
 
 	output := filepath.Join(root, "temp", name+".png")
 	cmd := exec.Command("ffmpeg",
+		"-y",
 		"-i", path,
 		"-frames", "1",
 		output)
@@ -73,7 +74,8 @@ func ExtractFrame(root string, path string, name string) string {
 		panic(err)
 	}
 	if err := cmd.Wait(); err != nil {
-		panic(err.Error())
+		println(cmd.String())
+		panic(err)
 	}
 
 	return output
