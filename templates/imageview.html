@@ -150,8 +150,14 @@
           {{ end }}
         {{ end }}
       </div>
-      <div id="hash" class="">
-        <span>{{ .Hash }}</span>
+      <div id="series" class="input-group">
+        <input class="form-control" list="seriesOptions" id="seriesInput" value="{{ .ImageSeries }}" />
+        <datalist id="seriesOptions">
+          {{ range .Series }}
+            <option value="{{ . }}"></option>
+          {{ end }}
+        </datalist>
+        <button class="btn btn-outline-secondary" type="button" onclick="changeSeries()">Apply</button>
       </div>
     {{ end }}    <script>
 			document.addEventListener("keydown", function(e) {
@@ -173,5 +179,10 @@
 				}, urlParams.get("timer"))
 			}
 		</script>
+    <script>
+      function changeSeries() {
+        window.location.href = "/api/changeseries?hash={{ .Hash }}&series=" + document.getElementById("seriesInput").value
+      }
+    </script>
   </body>
 </html>

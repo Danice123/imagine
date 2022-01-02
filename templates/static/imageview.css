@@ -92,18 +92,16 @@ svg {
 
 #tags {
   position: fixed;
-  top: 0px;
+  top: 75px;
   left: 0px;
   z-index: 2147483600;
   flex-wrap: wrap;
   height: 80%;
 }
 
-#hash {
-  position: fixed;
-  top: 0px;
-  left: 50%;
+#series {
   z-index: 2147483600;
-  background-color: red;
   border: 5px solid black;
+  background-color: black;
+  width: 25%;
 }

@@ -49,6 +49,20 @@ func TrashImage(w http.ResponseWriter, req *http.Request, ps httprouter.Params) 
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }
 
+func ChangeSeries(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	hash := req.URL.Query().Get("hash")
+	if hash == "" {
+		return
+	}
+
+	series := req.URL.Query().Get("series")
+	sm := COLLECTIONHANDLER.Series()
+	sm.AddImageToSeries(hash, series)
+	sm.Write()
+
+	http.Redirect(w, req, req.Referer(), http.StatusFound)
+}
+
 // func CleanImages(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 // 	tags, err := COLLECTIONHANDLER.Tags()
 // 	if err != nil {

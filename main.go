@@ -26,6 +26,7 @@ func main() {
 	router.GET("/api/random", endpoint.ToggleRandom)
 	router.GET("/api/editing", endpoint.ToggleEditing)
 	router.GET("/api/tag/*path", endpoint.ToggleTag)
+	router.GET("/api/changeseries", endpoint.ChangeSeries)
 	// router.GET("/api/clean", endpoint.CleanImages)
 	router.GET("/api/trash/*path", endpoint.TrashImage)
 	router.GET("/api/scan", func(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {

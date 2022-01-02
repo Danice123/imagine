@@ -34,9 +34,11 @@ type ImageData struct {
 	Previous    string
 	RandomState bool
 	Image       *collection.Image
+	ImageSeries string
 	Hash        string
 	ShowTags    bool
 	Tags        []collection.Tag
+	Series      []string
 }
 
 func handleEditingCookie(req *http.Request) bool {
@@ -63,6 +65,7 @@ func ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 		http.Error(w, "Not Found", http.StatusNotFound)
 		return
 	}
+	series := COLLECTIONHANDLER.Series()
 
 	data := &ImageData{
 		Url:         ps.ByName("path"),
@@ -71,6 +74,7 @@ func ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 		QueryString: query.Encode(),
 		ShowTags:    handleEditingCookie(req),
 		Image:       image,
+		Series:      series.SeriesList(),
 	}
 
 	dir := image.Directory()
@@ -98,6 +102,8 @@ func ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 	data.Tags = tagHandler.Get(image)
 	data.Hash = image.MD5()
+	imageSeries, _ := series.IsImageInSeries(image)
+	data.ImageSeries = imageSeries
 	data.Next = iterator.FindNextFile(1).RelativePath
 	data.Previous = iterator.FindNextFile(-1).RelativePath
 

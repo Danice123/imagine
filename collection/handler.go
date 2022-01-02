@@ -81,7 +81,7 @@ func (ths *CollectionHandler) Tags() *TagHandler {
 }
 
 func (ths *CollectionHandler) Series() *SeriesManager {
-	sm := &SeriesManager{}
+	sm := &SeriesManager{path: filepath.Join(ths.rootDirectory, ".series.json")}
 	if rawJson, err := os.ReadFile(filepath.Join(ths.rootDirectory, ".series.json")); err != nil {
 		sm.Initialize()
 		return sm
