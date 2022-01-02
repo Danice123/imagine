@@ -14,11 +14,19 @@ type CollectionIterator struct {
 }
 
 func (ths *CollectionIterator) FindNextFile(direction int) *Image {
-	if _, ok := ths.series.IsImageInSeries(ths.Images[ths.currentFile]); ok {
+	if series, ok := ths.series.IsImageInSeries(ths.Images[ths.currentFile]); ok {
 		hash := ths.series.NextImageHashInSeries(ths.Images[ths.currentFile], direction)
-		for _, image := range ths.Images {
-			if image.MD5() == hash {
-				return image
+		if hash != "" {
+			for _, image := range ths.Images {
+				if image.MD5() == hash {
+					return image
+				}
+			}
+		} else {
+			for i, image := range ths.Images {
+				if image.MD5() == ths.series.Series[series][0] {
+					ths.currentFile = i
+				}
 			}
 		}
 	}
@@ -56,11 +64,7 @@ func (ths *CollectionIterator) FindNextFile(direction int) *Image {
 			continue
 		}
 		if series, ok := ths.series.IsImageInSeries(ths.Images[n]); ok {
-			if direction > 0 && ths.series.Series[series][0] != ths.Images[n].MD5() {
-				n += direction
-				continue
-			}
-			if direction < 0 && ths.series.Series[series][len(ths.series.Series[series])-1] != ths.Images[n].MD5() {
+			if ths.series.Series[series][0] != ths.Images[n].MD5() {
 				n += direction
 				continue
 			}
