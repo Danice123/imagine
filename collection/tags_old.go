@@ -1,4 +1,4 @@
-package imagetag
+package collection
 
 import (
 	"encoding/json"
@@ -7,14 +7,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/Danice123/imagine/imageinstance"
 )
 
 type TagTable struct {
 	Tags     []string
 	Mapping  map[string]*TagFile
 	HashDups map[string][]string
+
+	path string
 }
 
 type TagFile struct {
@@ -23,41 +23,28 @@ type TagFile struct {
 	PHash string
 }
 
-func New(root string) (*TagTable, error) {
-	if rawJson, err := os.ReadFile(filepath.Join(root, ".tags.json")); err != nil {
-		return &TagTable{}, nil
-	} else {
-		tagTable := &TagTable{}
-		if err := json.Unmarshal(rawJson, tagTable); err != nil {
-			return nil, err
-		} else {
-			return tagTable, nil
-		}
-	}
-}
-
-func (ths *TagTable) WriteFile(root string) error {
+func (ths *TagTable) WriteFile() error {
 	if jsonData, err := json.MarshalIndent(ths, "", "\t"); err != nil {
 		return err
 	} else {
-		if err := os.WriteFile(filepath.Join(root, ".tags.json"), jsonData, os.FileMode(int(0777))); err != nil {
+		if err := os.WriteFile(ths.path, jsonData, os.FileMode(int(0777))); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (ths *TagTable) ReadTags(file string) []imageinstance.Tag {
-	tags := []imageinstance.Tag{}
+func (ths *TagTable) ReadTags(image *Image) []Tag {
+	tags := []Tag{}
 	for _, tag := range ths.Tags {
 		isValid := false
-		if _, ok := ths.Mapping[file]; ok {
-			if _, ok := ths.Mapping[file].Tags[tag]; ok {
+		if _, ok := ths.Mapping[image.RelativePath]; ok {
+			if _, ok := ths.Mapping[image.RelativePath].Tags[tag]; ok {
 				isValid = true
 			}
 		}
 
-		tags = append(tags, imageinstance.Tag{
+		tags = append(tags, Tag{
 			Name:  tag,
 			Valid: isValid,
 		})
@@ -89,7 +76,7 @@ func (ths *TagTable) HasTag(file string, tag string) (bool, error) {
 	}
 }
 
-func (ths *TagTable) WriteTag(root string, file string, tag string) error {
+func (ths *TagTable) WriteTag(file string, tag string) error {
 	if ths.Mapping == nil {
 		ths.Mapping = make(map[string]*TagFile)
 	}
@@ -106,21 +93,21 @@ func (ths *TagTable) WriteTag(root string, file string, tag string) error {
 		ths.Mapping[file].Tags[tag] = struct{}{}
 	}
 
-	return ths.WriteFile(root)
+	return ths.WriteFile()
 }
 
-func (ths *TagTable) DeleteFile(root string, file string) error {
+func (ths *TagTable) DeleteFile(file string) error {
 	delete(ths.Mapping, file)
-	return ths.WriteFile(root)
+	return ths.WriteFile()
 }
 
-func (ths *TagTable) SetDupList(root string, hash string, images []string) error {
+func (ths *TagTable) SetDupList(hash string, images []string) error {
 	if ths.HashDups == nil {
 		ths.HashDups = make(map[string][]string)
 	}
 
 	ths.HashDups[hash] = images
-	return ths.WriteFile(root)
+	return ths.WriteFile()
 }
 
 type FilePath struct {

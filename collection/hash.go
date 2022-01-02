@@ -1,4 +1,4 @@
-package imagetag
+package collection
 
 import (
 	"crypto/md5"
@@ -16,19 +16,20 @@ import (
 	"github.com/corona10/goimagehash"
 )
 
-func MD5Hash(root string, path string) (string, error) {
-	file, err := os.ReadFile(path)
+func (ths *CollectionHandler) MD5Hash(input *Image) (string, error) {
+	file, err := os.ReadFile(input.FullPath)
 	if err != nil {
 		return "", err
 	}
-
 	hasher := md5.New()
 	hasher.Write(file)
 	return hex.EncodeToString(hasher.Sum(nil)), nil
 }
 
-func PerceptionHash(root string, path string) (string, error) {
-	switch strings.ToLower(filepath.Ext(path)) {
+func (ths *CollectionHandler) PerceptionHash(input *Image) (string, error) {
+	path := input.FullPath
+
+	switch strings.ToLower(filepath.Ext(input.RelativePath)) {
 	case ".png":
 	case ".jpg":
 	case ".jpeg":
@@ -37,7 +38,7 @@ func PerceptionHash(root string, path string) (string, error) {
 	case ".mp4":
 		fallthrough
 	case ".webm":
-		path = ExtractFrame(root, path, filepath.Base(path))
+		path = ths.ExtractFrame(input)
 	default:
 		return "", nil
 	}
@@ -57,16 +58,16 @@ func PerceptionHash(root string, path string) (string, error) {
 	}
 }
 
-func ExtractFrame(root string, path string, name string) string {
-	tempDir := filepath.Join(root, "temp")
+func (ths *CollectionHandler) ExtractFrame(image *Image) string {
+	tempDir := filepath.Join(ths.rootDirectory, "temp")
 	if _, err := os.Stat(tempDir); err != nil {
 		os.Mkdir(tempDir, os.FileMode(int(0777)))
 	}
 
-	output := filepath.Join(root, "temp", name+".png")
+	output := filepath.Join(ths.rootDirectory, "temp", filepath.Base(image.RelativePath))
 	cmd := exec.Command("ffmpeg",
 		"-y",
-		"-i", path,
+		"-i", image.FullPath,
 		"-frames", "1",
 		output)
 

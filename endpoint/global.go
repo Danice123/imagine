@@ -1,5 +1,5 @@
 package endpoint
 
-type Endpoints struct {
-	Root string
-}
+import "github.com/Danice123/imagine/collection"
+
+var COLLECTIONHANDLER *collection.CollectionHandler

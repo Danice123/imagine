@@ -4,34 +4,34 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Danice123/imagine/collection"
+	"github.com/Danice123/imagine/endpoint"
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/net/websocket"
-
-	"github.com/Danice123/imagine/endpoint"
 )
 
 func main() {
+	endpoint.COLLECTIONHANDLER = &collection.CollectionHandler{}
+	endpoint.COLLECTIONHANDLER.Initialize(os.Args[2])
+
 	router := httprouter.New()
-	endpoints := endpoint.Endpoints{
-		Root: os.Args[2],
-	}
 
-	router.GET("/", endpoints.Home)
-	router.GET("/raw/*path", endpoints.RawImage)
-	router.GET("/browse/*path", endpoints.ImageView)
-	router.GET("/tags/*path", endpoints.TagView)
-	router.GET("/dups", endpoints.DupsView)
-	router.GET("/dupcompare", endpoints.DupCompare)
+	router.GET("/", endpoint.Home)
+	router.GET("/raw/*path", endpoint.RawImage)
+	router.GET("/browse/*path", endpoint.ImageView)
+	router.GET("/tags/*path", endpoint.TagView)
+	router.GET("/dups", endpoint.DupsView)
+	// router.GET("/dupcompare", endpoint.DupCompare)
 
-	router.GET("/api/random", endpoints.ToggleRandom)
-	router.GET("/api/editing", endpoints.ToggleEditing)
-	router.GET("/api/tag/*path", endpoints.ToggleTag)
-	router.GET("/api/clean", endpoints.CleanImages)
-	router.GET("/api/trash/*path", endpoints.TrashImage)
+	router.GET("/api/random", endpoint.ToggleRandom)
+	router.GET("/api/editing", endpoint.ToggleEditing)
+	router.GET("/api/tag/*path", endpoint.ToggleTag)
+	// router.GET("/api/clean", endpoint.CleanImages)
+	router.GET("/api/trash/*path", endpoint.TrashImage)
 	router.GET("/api/scan", func(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		websocket.Handler(endpoints.Scan).ServeHTTP(rw, r)
+		websocket.Handler(endpoint.Scan).ServeHTTP(rw, r)
 	})
-	router.GET("/api/markasnotdup", endpoints.MarkAsNotDup)
+	// router.GET("/api/markasnotdup", endpoint.MarkAsNotDup)
 
 	static := http.FileServer(http.Dir("./templates/static"))
 	router.Handler("GET", "/static/*path", http.StripPrefix("/static/", static))

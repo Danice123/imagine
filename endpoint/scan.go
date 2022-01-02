@@ -1,9 +1,7 @@
 package endpoint
 
 import (
-	"path/filepath"
-
-	"github.com/Danice123/imagine/imagetag"
+	"github.com/Danice123/imagine/collection"
 	"golang.org/x/net/websocket"
 )
 
@@ -17,67 +15,71 @@ type Scanprogress struct {
 	Total    int
 }
 
-func (ths *Endpoints) Scan(conn *websocket.Conn) {
+func Scan(conn *websocket.Conn) {
 	req := &Scanrequest{}
 	if err := websocket.JSON.Receive(conn, req); err != nil {
 		panic(err)
 	}
 
-	tags, err := imagetag.New(ths.Root)
-	if err != nil {
-		panic(err.Error())
-	}
+	hc := COLLECTIONHANDLER.HashCache()
 
-	var hashFunc func(string, string) (string, error)
+	var hashFunc func(*collection.Image) (string, error)
 	var checkHash func(string) bool
 	var writeHash func(string, string)
+	var finish func()
 	switch req.ScanType {
 	case "md5":
-		hashFunc = imagetag.MD5Hash
+		hashFunc = COLLECTIONHANDLER.MD5Hash
 		checkHash = func(file string) bool {
-			return tags.Mapping[file].MD5 == ""
+			return hc.Hash(file) == ""
 		}
-		writeHash = func(file string, hash string) {
-			tags.Mapping[file].MD5 = hash
+		writeHash = hc.PutHash
+		finish = func() {
+			hc.Save()
 		}
 	case "phash":
-		hashFunc = imagetag.PerceptionHash
+		hd := COLLECTIONHANDLER.HashDirectory()
+		hashFunc = COLLECTIONHANDLER.PerceptionHash
 		checkHash = func(file string) bool {
-			return tags.Mapping[file].PHash == ""
+			d := hd.Data(hc.Hash(file))
+			if d == nil {
+				return true
+			}
+			return d.PHash == ""
 		}
 		writeHash = func(file string, hash string) {
-			tags.Mapping[file].PHash = hash
+			if hd.Data(hc.Hash(file)) == nil {
+				hd.CreateData(hc.Hash(file))
+			}
+			d := hd.Data(hc.Hash(file))
+			d.PHash = hash
+		}
+		finish = func() {
+			hd.Save()
 		}
 	default:
 		conn.Close()
 		return
 	}
 
-	files := tags.Scan(ths.Root)
-	for i := 0; i < len(files); i++ {
-		if filepath.Dir(files[i].Path) == filepath.Join(ths.Root, "temp") || filepath.Dir(files[i].Path) == filepath.Join(ths.Root, "trash") {
-			continue
-		}
-		if req.ScanAll || checkHash(files[i].File) {
-			if hash, err := hashFunc(ths.Root, files[i].Path); err != nil {
+	images := COLLECTIONHANDLER.Scan()
+	for i := 0; i < len(images); i++ {
+		if req.ScanAll || checkHash(images[i].RelativePath) {
+			if hash, err := hashFunc(images[i]); err != nil {
 				panic(err)
 			} else {
-				writeHash(files[i].File, hash)
-
-			}
-			if i%10 == 0 {
-				tags.WriteFile(ths.Root)
+				writeHash(images[i].RelativePath, hash)
 			}
 		}
 		websocket.JSON.Send(conn, &Scanprogress{
 			Progress: i + 1,
-			Total:    len(files),
+			Total:    len(images),
 		})
 	}
+	finish()
 	websocket.JSON.Send(conn, &Scanprogress{
-		Progress: len(files),
-		Total:    len(files),
+		Progress: len(images),
+		Total:    len(images),
 	})
-	tags.WriteFile(ths.Root)
 	conn.Close()
 }
