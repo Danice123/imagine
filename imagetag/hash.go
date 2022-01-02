@@ -32,9 +32,10 @@ func PerceptionHash(root string, path string) (string, error) {
 	case ".png":
 	case ".jpg":
 	case ".jpeg":
-		break
 	case ".gif":
+		fallthrough
 	case ".mp4":
+		fallthrough
 	case ".webm":
 		path = ExtractFrame(root, path, filepath.Base(path))
 	default:
