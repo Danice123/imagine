@@ -84,3 +84,7 @@ func (ths *Image) Directory() *Directory {
 		collection:   ths.collection,
 	}
 }
+
+func (ths *Image) MD5() string {
+	return ths.collection.HashCache().Hash(ths)
+}

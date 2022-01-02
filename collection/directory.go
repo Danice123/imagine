@@ -46,11 +46,12 @@ func (ths *Directory) TagListing() map[string]int {
 
 func (ths *Directory) Iterator(currentImage *Image, sorter func([]*Image)) *CollectionIterator {
 	iterator := &CollectionIterator{
-		Files:   ths.Contents(),
+		Images:  ths.Contents(),
 		Filters: []Filter{},
+		series:  ths.collection.Series(),
 	}
-	sorter(iterator.Files)
-	for i, file := range iterator.Files {
+	sorter(iterator.Images)
+	for i, file := range iterator.Images {
 		if file.RelativePath == currentImage.RelativePath {
 			iterator.currentFile = i
 			break

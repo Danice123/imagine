@@ -80,6 +80,20 @@ func (ths *CollectionHandler) Tags() *TagHandler {
 	return tagHandler
 }
 
+func (ths *CollectionHandler) Series() *SeriesManager {
+	sm := &SeriesManager{}
+	if rawJson, err := os.ReadFile(filepath.Join(ths.rootDirectory, ".series.json")); err != nil {
+		sm.Initialize()
+		return sm
+	} else {
+		if err := json.Unmarshal(rawJson, sm); err != nil {
+			panic(err)
+		}
+	}
+	sm.Initialize()
+	return sm
+}
+
 func (ths *CollectionHandler) Trash() string {
 	trashDir := filepath.Join(ths.rootDirectory, "trash")
 	if _, err := os.Stat(trashDir); err != nil {

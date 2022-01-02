@@ -134,6 +134,7 @@
 
     {{ if .ShowTags }}
       <div id="tags" class="btn-group-vertical">
+        <a class="btn btn-warn">{{ .Hash }}</a>
         {{ range .Tags }}
           {{ if .Valid }}
             <a

@@ -7,12 +7,22 @@ type Filter interface {
 }
 
 type CollectionIterator struct {
-	Files       []*Image
+	Images      []*Image
 	Filters     []Filter
+	series      *SeriesManager
 	currentFile int
 }
 
 func (ths *CollectionIterator) FindNextFile(direction int) *Image {
+	if _, ok := ths.series.IsImageInSeries(ths.Images[ths.currentFile]); ok {
+		hash := ths.series.NextImageHashInSeries(ths.Images[ths.currentFile], direction)
+		for _, image := range ths.Images {
+			if image.MD5() == hash {
+				return image
+			}
+		}
+	}
+
 	n := ths.currentFile + direction
 	hasLooped := false
 
@@ -27,7 +37,7 @@ func (ths *CollectionIterator) FindNextFile(direction int) *Image {
 	}
 
 	for {
-		if n >= len(ths.Files) {
+		if n >= len(ths.Images) {
 			n = 0
 			if hasLooped {
 				return nil
@@ -35,17 +45,27 @@ func (ths *CollectionIterator) FindNextFile(direction int) *Image {
 			hasLooped = true
 		}
 		if n < 0 {
-			n = len(ths.Files) - 1
+			n = len(ths.Images) - 1
 			if hasLooped {
 				return nil
 			}
 			hasLooped = true
 		}
-		if ths.Files[n].IsDir() || strings.HasPrefix(ths.Files[n].Name(), ".") || filter(ths.Files[n]) {
+		if ths.Images[n].IsDir() || strings.HasPrefix(ths.Images[n].Name(), ".") || filter(ths.Images[n]) {
 			n += direction
 			continue
 		}
+		if series, ok := ths.series.IsImageInSeries(ths.Images[n]); ok {
+			if direction > 0 && ths.series.Series[series][0] != ths.Images[n].MD5() {
+				n += direction
+				continue
+			}
+			if direction < 0 && ths.series.Series[series][len(ths.series.Series[series])-1] != ths.Images[n].MD5() {
+				n += direction
+				continue
+			}
+		}
 		break
 	}
-	return ths.Files[n]
+	return ths.Images[n]
 }

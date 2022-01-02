@@ -34,6 +34,7 @@ type ImageData struct {
 	Previous    string
 	RandomState bool
 	Image       *collection.Image
+	Hash        string
 	ShowTags    bool
 	Tags        []collection.Tag
 }
@@ -96,6 +97,7 @@ func ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	}
 
 	data.Tags = tagHandler.Get(image)
+	data.Hash = image.MD5()
 	data.Next = iterator.FindNextFile(1).RelativePath
 	data.Previous = iterator.FindNextFile(-1).RelativePath
 

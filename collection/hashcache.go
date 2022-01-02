@@ -6,7 +6,8 @@ import (
 )
 
 type HashCache struct {
-	data *map[string]string
+	data     *map[string]string
+	reversed map[string]string
 
 	path     string
 	hashFunc func(*Image) (string, error)
@@ -20,6 +21,11 @@ func (ths *HashCache) Load() {
 		if err := json.Unmarshal(rawJson, ths.data); err != nil {
 			panic(err)
 		}
+	}
+
+	ths.reversed = map[string]string{}
+	for p, h := range *ths.data {
+		ths.reversed[h] = p
 	}
 }
 
@@ -39,7 +45,7 @@ func (ths *HashCache) Hash(image *Image) string {
 		if err != nil {
 			panic(err)
 		}
-		(*ths.data)[image.RelativePath] = newHash
+		ths.PutHash(image, newHash)
 	}
 
 	return (*ths.data)[image.RelativePath]
@@ -47,6 +53,8 @@ func (ths *HashCache) Hash(image *Image) string {
 
 func (ths *HashCache) PutHash(image *Image, hash string) {
 	(*ths.data)[image.RelativePath] = hash
+	ths.reversed[hash] = image.RelativePath
+	ths.Save()
 }
 
 func (ths *HashCache) GetDups() map[string][]string {
@@ -66,4 +74,8 @@ func (ths *HashCache) GetDups() map[string][]string {
 	}
 
 	return check
+}
+
+func (ths *HashCache) GetImagePathByHash(hash string) string {
+	return ths.reversed[hash]
 }
