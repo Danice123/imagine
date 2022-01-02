@@ -19,7 +19,6 @@ type TagTable struct {
 
 type TagFile struct {
 	Tags  map[string]struct{}
-	Mood  string
 	MD5   string
 	PHash string
 }
@@ -107,28 +106,6 @@ func (ths *TagTable) WriteTag(root string, file string, tag string) error {
 		ths.Mapping[file].Tags[tag] = struct{}{}
 	}
 
-	return ths.WriteFile(root)
-}
-
-func (ths *TagTable) ReadMood(file string) string {
-	if _, ok := ths.Mapping[file]; ok {
-		return ths.Mapping[file].Mood
-	}
-	return ""
-}
-
-func (ths *TagTable) SetMood(root string, file string, mood string) error {
-	if ths.Mapping == nil {
-		ths.Mapping = make(map[string]*TagFile)
-	}
-
-	if _, ok := ths.Mapping[file]; !ok {
-		ths.Mapping[file] = &TagFile{
-			Tags: make(map[string]struct{}),
-		}
-	}
-
-	ths.Mapping[file].Mood = mood
 	return ths.WriteFile(root)
 }
 

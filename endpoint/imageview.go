@@ -31,17 +31,6 @@ func (ths *TagFilter) IsValid(tags *imagetag.TagTable, name string) bool {
 	}
 }
 
-type MoodFilter struct {
-	Mood string
-}
-
-func (ths *MoodFilter) IsValid(tags *imagetag.TagTable, name string) bool {
-	if image, ok := tags.Mapping[name]; ok {
-		return image.Mood == ths.Mood
-	}
-	return false
-}
-
 type ImageData struct {
 	Url         string
 	Path        string
@@ -52,7 +41,6 @@ type ImageData struct {
 	Image       *imageinstance.ImageInstance
 	ShowTags    bool
 	Tags        []imageinstance.Tag
-	Mood        string
 }
 
 func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -108,14 +96,6 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 		}
 	}
 
-	if cookie, err := req.Cookie("mood"); err == nil {
-		if cookie.Value != "" && !isEditing {
-			filters = append(filters, &MoodFilter{
-				Mood: cookie.Value,
-			})
-		}
-	}
-
 	filter := func(name string) bool {
 		imageName := strings.ReplaceAll(strings.TrimPrefix(filepath.Join(targetImage.BaseDir(), name), ths.Root), "\\", "/")
 		shouldFilter := false
@@ -134,7 +114,6 @@ func (ths *Endpoints) ImageView(w http.ResponseWriter, req *http.Request, ps htt
 	}
 
 	data.Tags = tags.ReadTags(ps.ByName("path"))
-	data.Mood = tags.ReadMood(ps.ByName("path"))
 	data.Next = iterator.FindNextFile(1, filter)
 	data.Previous = iterator.FindNextFile(-1, filter)
 
