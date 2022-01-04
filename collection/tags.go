@@ -36,6 +36,10 @@ func (ths *TagHandler) Get(image *Image) []Tag {
 
 func (ths *TagHandler) HasTag(image *Image, tag string) (bool, error) {
 	if data := ths.hd.Data(ths.hc.Hash(image)); data != nil {
+		if data.Tags == nil || len(data.Tags) == 0 {
+			return tag == "None", nil
+		}
+
 		if _, ok := data.Tags[tag]; ok {
 			return true, nil
 		} else if expression, err := regexp.Compile("^(?i)" + strings.ReplaceAll(regexp.QuoteMeta(tag), "\\*", ".*") + "$"); err != nil {
@@ -47,14 +51,20 @@ func (ths *TagHandler) HasTag(image *Image, tag string) (bool, error) {
 				}
 			}
 		}
+		return false, nil
+	} else {
+		return tag == "None", nil
 	}
-	return false, nil
 }
 
 func (ths *TagHandler) WriteTag(image *Image, tag string) {
 	data := ths.hd.Data(ths.hc.Hash(image))
 	if data == nil {
 		data = ths.hd.CreateData(ths.hc.Hash(image))
+	}
+
+	if data.Tags == nil {
+		data.Tags = map[string]struct{}{}
 	}
 
 	if _, ok := data.Tags[tag]; ok {

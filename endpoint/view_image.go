@@ -96,7 +96,13 @@ func ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	}
 
 	if image.IsDir() {
-		http.Redirect(w, req, fmt.Sprintf("/browse/%s?%s", iterator.FindNextFile(1).RelativePath, req.URL.Query().Encode()), http.StatusFound)
+		next := iterator.FindNextFile(1)
+		if next == nil {
+			http.Error(w, "No image found", http.StatusNotFound)
+			return
+		}
+
+		http.Redirect(w, req, fmt.Sprintf("/browse/%s?%s", next.RelativePath, req.URL.Query().Encode()), http.StatusFound)
 		return
 	}
 
@@ -104,8 +110,15 @@ func ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	data.Hash = image.MD5()
 	imageSeries, _ := series.IsImageInSeries(image)
 	data.ImageSeries = imageSeries
-	data.Next = iterator.FindNextFile(1).RelativePath
-	data.Previous = iterator.FindNextFile(-1).RelativePath
+
+	next := iterator.FindNextFile(1)
+	if next != nil {
+		data.Next = next.RelativePath
+	}
+	previous := iterator.FindNextFile(-1)
+	if previous != nil {
+		data.Previous = previous.RelativePath
+	}
 
 	var imageTemplate = template.New("ImageView")
 	if html, err := os.ReadFile(filepath.Join("templates", "imageview.html")); err != nil {
