@@ -11,12 +11,23 @@ video {
   margin: auto;
 }
 
-video:not(.fullscreen) {
+video:not(.fullscreen, .bigscreen, .biggerscreen) {
   height: 100%;
 }
 
+video.bigscreen {
+  min-width: 50%;
+  min-height: 100%;
+}
+
+video.biggerscreen {
+  min-width: 75%;
+  min-height: 100%;
+}
+
 video.fullscreen {
-  width: 100%;
+  min-width: 100%;
+  min-height: 100%;
 }
 
 img {
@@ -28,12 +39,23 @@ img {
   margin: auto;
 }
 
-img:not(.fullscreen) {
+img:not(.fullscreen, .bigscreen, .biggerscreen) {
   height: 100%;
 }
 
+img.bigscreen {
+  min-width: 50%;
+  min-height: 100%;
+}
+
+img.biggerscreen {
+  min-width: 75%;
+  min-height: 100%;
+}
+
 img.fullscreen {
-  width: 100%;
+  min-width: 100%;
+  min-height: 100%;
 }
 
 svg {

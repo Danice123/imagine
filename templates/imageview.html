@@ -181,10 +181,19 @@
 					break;
         case 70:
           let media = document.getElementById("media")
-          if (media.className === "fullscreen") {
-            media.className = ""
-          } else {
-            media.className = "fullscreen"
+          switch (media.className) {
+            case "":
+              media.className = "bigscreen"
+              break;
+            case "bigscreen":
+              media.className = "biggerscreen"
+              break;
+            case "biggerscreen":
+              media.className = "fullscreen"
+              break
+            case "fullscreen":
+              media.className = ""
+              break;
           }
           break;
 				}
