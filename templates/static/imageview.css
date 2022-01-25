@@ -7,23 +7,33 @@ video {
   position: absolute;
   top: 0px;
   right: 0px;
-  bottom: 0px;
   left: 0px;
-  height: 100%;
-  max-width: 100%;
   margin: auto;
+}
+
+video:not(.fullscreen) {
+  height: 100%;
+}
+
+video.fullscreen {
+  width: 100%;
 }
 
 img {
   position: absolute;
   top: 0px;
   right: 0px;
-  bottom: 0px;
   left: 0px;
-  height: 100%;
-  max-width: 100%;
   object-fit: contain;
   margin: auto;
+}
+
+img:not(.fullscreen) {
+  height: 100%;
+}
+
+img.fullscreen {
+  width: 100%;
 }
 
 svg {
