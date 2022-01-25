@@ -16,18 +16,15 @@ video:not(.fullscreen, .bigscreen, .biggerscreen) {
 }
 
 video.bigscreen {
-  min-width: 50%;
-  min-height: 100%;
+  width: 50%;
 }
 
 video.biggerscreen {
-  min-width: 75%;
-  min-height: 100%;
+  width: 75%;
 }
 
 video.fullscreen {
-  min-width: 100%;
-  min-height: 100%;
+  width: 100%;
 }
 
 img {
@@ -44,18 +41,15 @@ img:not(.fullscreen, .bigscreen, .biggerscreen) {
 }
 
 img.bigscreen {
-  min-width: 50%;
-  min-height: 100%;
+  width: 50%;
 }
 
 img.biggerscreen {
-  min-width: 75%;
-  min-height: 100%;
+  width: 75%;
 }
 
 img.fullscreen {
-  min-width: 100%;
-  min-height: 100%;
+  width: 100%;
 }
 
 svg {
