@@ -2,11 +2,12 @@ package collection
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
 type HashCache struct {
-	data     *map[string]string
+	data     map[string]string
 	reversed map[string]string
 
 	path     string
@@ -14,17 +15,15 @@ type HashCache struct {
 }
 
 func (ths *HashCache) Load() {
-	ths.data = &map[string]string{}
+	ths.data = map[string]string{}
 	if rawJson, err := os.ReadFile(ths.path); err != nil {
+		fmt.Println("Hashcache not found.")
+	} else if err := json.Unmarshal(rawJson, &ths.data); err != nil {
 		panic(err)
-	} else {
-		if err := json.Unmarshal(rawJson, ths.data); err != nil {
-			panic(err)
-		}
 	}
 
 	ths.reversed = map[string]string{}
-	for p, h := range *ths.data {
+	for p, h := range ths.data {
 		ths.reversed[h] = p
 	}
 }
@@ -40,7 +39,7 @@ func (ths *HashCache) Save() {
 }
 
 func (ths *HashCache) Hash(image *Image) string {
-	if (*ths.data)[image.RelativePath] == "" {
+	if ths.data[image.RelativePath] == "" {
 		newHash, err := ths.hashFunc(image)
 		if err != nil {
 			panic(err)
@@ -48,18 +47,18 @@ func (ths *HashCache) Hash(image *Image) string {
 		ths.PutHash(image, newHash)
 	}
 
-	return (*ths.data)[image.RelativePath]
+	return ths.data[image.RelativePath]
 }
 
 func (ths *HashCache) PutHash(image *Image, hash string) {
-	(*ths.data)[image.RelativePath] = hash
+	ths.data[image.RelativePath] = hash
 	ths.reversed[hash] = image.RelativePath
 	ths.Save()
 }
 
 func (ths *HashCache) GetDups() map[string][]string {
 	check := map[string][]string{}
-	for path, hash := range *ths.data {
+	for path, hash := range ths.data {
 		if _, ok := check[hash]; !ok {
 			check[hash] = []string{path}
 		} else {
