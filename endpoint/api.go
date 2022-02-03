@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -62,19 +63,15 @@ func ChangeSeries(w http.ResponseWriter, req *http.Request, ps httprouter.Params
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }
 
-// func CleanImages(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-// 	tags, err := COLLECTIONHANDLER.Tags()
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-
-// 	for path := range tags.Mapping {
-// 		if _, err := os.Stat(filepath.Join(ths.Root, path)); err != nil {
-// 			if err := tags.DeleteFile(ths.Root, path); err != nil {
-// 				panic(err.Error())
-// 			}
-// 		}
-// 	}
-
-// 	http.Redirect(w, req, req.Referer(), http.StatusFound)
-// }
+func CleanImages(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	hc := COLLECTIONHANDLER.HashCache()
+	var count int
+	for _, path := range hc.CachedImages() {
+		image := COLLECTIONHANDLER.Image(path)
+		if !image.IsValid() {
+			hc.RemoveHash(image)
+			count++
+		}
+	}
+	w.Write([]byte(strconv.Itoa(count)))
+}

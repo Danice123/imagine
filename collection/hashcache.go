@@ -57,11 +57,8 @@ func (ths *HashCache) PutHash(image *Image, hash string) {
 }
 
 func (ths *HashCache) RemoveHash(image *Image) {
+	hash := ths.data[image.RelativePath]
 	delete(ths.data, image.RelativePath)
-	hash, err := ths.hashFunc(image)
-	if err != nil {
-		panic(err)
-	}
 	delete(ths.reversed, hash)
 	ths.Save()
 }
@@ -87,4 +84,12 @@ func (ths *HashCache) GetDups() map[string][]string {
 
 func (ths *HashCache) GetImagePathByHash(hash string) string {
 	return ths.reversed[hash]
+}
+
+func (ths *HashCache) CachedImages() []string {
+	list := []string{}
+	for path := range ths.data {
+		list = append(list, path)
+	}
+	return list
 }
