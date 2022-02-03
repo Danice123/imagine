@@ -77,6 +77,6 @@ func (ths *TagHandler) WriteTag(image *Image, tag string) {
 }
 
 func (ths *TagHandler) DeleteTag(image *Image) {
-	ths.hd.DeleteData(image.RelativePath)
+	ths.hd.DeleteData(image.MD5())
 	ths.hd.Save()
 }

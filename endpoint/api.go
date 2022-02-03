@@ -40,12 +40,11 @@ func TrashImage(w http.ResponseWriter, req *http.Request, ps httprouter.Params) 
 		return
 	}
 
+	COLLECTIONHANDLER.HashCache().RemoveHash(image)
 	if err := os.Rename(image.FullPath, filepath.Join(COLLECTIONHANDLER.Trash(), filepath.Base(image.FullPath))); err != nil {
 		panic(err)
 	}
 
-	tags := COLLECTIONHANDLER.Tags()
-	tags.DeleteTag(image)
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }
 

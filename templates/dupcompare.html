@@ -16,11 +16,15 @@
     <div style="display: flex; flex-wrap: wrap; height: 100%;">
       {{ range .Images }}
         <div style="width: 50%;">
-          <a class="h4" href="/api/trash{{ . }}">{{ . }}</a>
-          <!-- <img src="/raw{{ . }}" style="width: 100%;" /> -->
-          <video autoplay loop>
-            <source src="/raw{{ . }}" />
-          </video>
+          <a class="h4" href="/api/trash{{ .Path }}">{{ .Path }}</a>
+          {{ if .IsVideo }}
+            <video autoplay loop>
+              <source src="/raw{{ .Path }}" />
+            </video>
+          {{ else }}
+            <img src="/raw{{ .Path }}" style="width: 100%;" />
+          {{ end }}
+          
         </div>
       {{ end }}
     </div>

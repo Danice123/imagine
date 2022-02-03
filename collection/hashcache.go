@@ -56,6 +56,16 @@ func (ths *HashCache) PutHash(image *Image, hash string) {
 	ths.Save()
 }
 
+func (ths *HashCache) RemoveHash(image *Image) {
+	delete(ths.data, image.RelativePath)
+	hash, err := ths.hashFunc(image)
+	if err != nil {
+		panic(err)
+	}
+	delete(ths.reversed, hash)
+	ths.Save()
+}
+
 func (ths *HashCache) GetDups() map[string][]string {
 	check := map[string][]string{}
 	for path, hash := range ths.data {

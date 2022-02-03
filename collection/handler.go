@@ -22,7 +22,7 @@ func (ths *CollectionHandler) Initialize(root string) {
 func (ths *CollectionHandler) Folders() []string {
 	folders := []string{}
 	filepath.WalkDir(ths.rootDirectory, func(path string, d fs.DirEntry, err error) error {
-		if d.IsDir() {
+		if d.IsDir() && d.Name() != "trash" && d.Name() != "temp" {
 			folders = append(folders, strings.TrimPrefix(path+"/", ths.rootDirectory))
 		}
 		return nil

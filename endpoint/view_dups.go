@@ -38,7 +38,11 @@ func DupsView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 			Images: images,
 		})
 	}
-	for hash, images := range phashset {
+	for hash, hashList := range phashset {
+		images := []string{}
+		for _, hash := range hashList {
+			images = append(images, COLLECTIONHANDLER.HashCache().GetImagePathByHash(hash))
+		}
 		sort.Strings(images)
 		// if checked, ok := tags.HashDups[hash]; ok {
 		// 	sort.Strings(checked)

@@ -21,7 +21,7 @@ func main() {
 	router.GET("/browse/*path", endpoint.ImageView)
 	router.GET("/tags/*path", endpoint.TagView)
 	router.GET("/dups", endpoint.DupsView)
-	// router.GET("/dupcompare", endpoint.DupCompare)
+	router.GET("/dupcompare", endpoint.DupCompare)
 
 	router.GET("/api/random", endpoint.ToggleRandom)
 	router.GET("/api/editing", endpoint.ToggleEditing)
