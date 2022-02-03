@@ -94,6 +94,12 @@ func (ths *CollectionHandler) Series() *SeriesManager {
 	return sm
 }
 
+func (ths *CollectionHandler) Duplicate() *DuplicateManager {
+	dm := &DuplicateManager{path: filepath.Join(ths.rootDirectory, ".duplicates.json")}
+	dm.Load()
+	return dm
+}
+
 func (ths *CollectionHandler) Trash() string {
 	trashDir := filepath.Join(ths.rootDirectory, "trash")
 	if _, err := os.Stat(trashDir); err != nil {

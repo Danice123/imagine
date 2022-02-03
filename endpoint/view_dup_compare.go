@@ -20,6 +20,22 @@ type DupImage struct {
 	IsVideo bool
 }
 
+func getImageList(hashType string, hash string) []string {
+	switch hashType {
+	case "MD5":
+		return COLLECTIONHANDLER.HashCache().GetDups()[hash]
+	case "PerceptionHash":
+		hashList := COLLECTIONHANDLER.HashDirectory().GetPHashDups()[hash]
+		imageList := []string{}
+		for _, hash := range hashList {
+			imageList = append(imageList, COLLECTIONHANDLER.HashCache().GetImagePathByHash(hash))
+		}
+		return imageList
+	default:
+		return nil
+	}
+}
+
 func DupCompare(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	params := req.URL.Query()
 	if params.Get("hash") == "" || params.Get("type") == "" {
@@ -27,17 +43,8 @@ func DupCompare(w http.ResponseWriter, req *http.Request, ps httprouter.Params) 
 		return
 	}
 
-	var imageList []string
-	switch params.Get("type") {
-	case "MD5":
-		imageList = COLLECTIONHANDLER.HashCache().GetDups()[params.Get("hash")]
-	case "PerceptionHash":
-		hashList := COLLECTIONHANDLER.HashDirectory().GetPHashDups()[params.Get("hash")]
-		imageList = []string{}
-		for _, hash := range hashList {
-			imageList = append(imageList, COLLECTIONHANDLER.HashCache().GetImagePathByHash(hash))
-		}
-	default:
+	imageList := getImageList(params.Get("type"), params.Get("hash"))
+	if imageList == nil {
 		http.Error(w, "Bad hash type", http.StatusNotFound)
 		return
 	}
@@ -67,30 +74,19 @@ func DupCompare(w http.ResponseWriter, req *http.Request, ps httprouter.Params) 
 	}
 }
 
-// func MarkAsNotDup(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-// 	params := req.URL.Query()
-// 	if params.Get("hash") == "" || params.Get("type") == "" {
-// 		http.Error(w, "Bad parameters", http.StatusNotFound)
-// 		return
-// 	}
+func MarkAsNotDup(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	params := req.URL.Query()
+	if params.Get("hash") == "" || params.Get("type") == "" {
+		http.Error(w, "Bad parameters", http.StatusNotFound)
+		return
+	}
 
-// 	tags, err := collection.New(ths.Root)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
+	imageList := getImageList(params.Get("type"), params.Get("hash"))
+	if imageList == nil {
+		http.Error(w, "Bad hash type", http.StatusNotFound)
+		return
+	}
 
-// 	images := []string{}
-// 	for image, imageData := range tags.Mapping {
-// 		if params.Get("type") == "MD5" && imageData.MD5 == params.Get("hash") {
-// 			images = append(images, image)
-// 		} else if params.Get("type") == "PerceptionHash" && imageData.PHash == params.Get("hash") {
-// 			images = append(images, image)
-// 		}
-// 	}
-
-// 	err = tags.SetDupList(ths.Root, params.Get("hash"), images)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	http.Redirect(w, req, "/dups", http.StatusFound)
-// }
+	COLLECTIONHANDLER.Duplicate().SetIsNotDup(params.Get("hash"), imageList)
+	http.Redirect(w, req, "/dups", http.StatusFound)
+}

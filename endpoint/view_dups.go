@@ -38,18 +38,18 @@ func DupsView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 			Images: images,
 		})
 	}
+	dm := COLLECTIONHANDLER.Duplicate()
 	for hash, hashList := range phashset {
 		images := []string{}
 		for _, hash := range hashList {
 			images = append(images, COLLECTIONHANDLER.HashCache().GetImagePathByHash(hash))
 		}
 		sort.Strings(images)
-		// if checked, ok := tags.HashDups[hash]; ok {
-		// 	sort.Strings(checked)
-		// 	if reflect.DeepEqual(checked, images) {
-		// 		continue
-		// 	}
-		// }
+
+		if !dm.IsDup(hash, images) {
+			continue
+		}
+
 		data.Duplicates = append(data.Duplicates, &Dup{
 			Type:   "PerceptionHash",
 			Hash:   hash,

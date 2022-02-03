@@ -32,7 +32,7 @@ func main() {
 	router.GET("/api/scan", func(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		websocket.Handler(endpoint.Scan).ServeHTTP(rw, r)
 	})
-	// router.GET("/api/markasnotdup", endpoint.MarkAsNotDup)
+	router.GET("/api/markasnotdup", endpoint.MarkAsNotDup)
 
 	static := http.FileServer(http.Dir("./templates/static"))
 	router.Handler("GET", "/static/*path", http.StripPrefix("/static/", static))
