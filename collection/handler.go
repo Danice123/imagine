@@ -2,6 +2,7 @@ package collection
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -69,7 +70,7 @@ func (ths *CollectionHandler) HashDirectory() *HashDirectory {
 func (ths *CollectionHandler) Tags() *TagHandler {
 	tagHandler := &TagHandler{}
 	if rawJson, err := os.ReadFile(filepath.Join(ths.rootDirectory, ".tags.json")); err != nil {
-		panic(err)
+		fmt.Printf("Tag file not found")
 	} else {
 		if err := json.Unmarshal(rawJson, tagHandler); err != nil {
 			panic(err)
