@@ -2,6 +2,7 @@ package collection
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -19,7 +20,7 @@ type ImageHashData struct {
 func (ths *HashDirectory) Load() {
 	ths.data = map[string]*ImageHashData{}
 	if rawJson, err := os.ReadFile(ths.path); err != nil {
-		panic(err)
+		fmt.Println("Hashdir not found.")
 	} else {
 		if err := json.Unmarshal(rawJson, &ths.data); err != nil {
 			panic(err)

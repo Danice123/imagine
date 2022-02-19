@@ -17,7 +17,7 @@ type DuplicateManager struct {
 func (ths *DuplicateManager) Load() {
 	ths.data = map[string][]string{}
 	if rawJson, err := os.ReadFile(ths.path); err != nil {
-		fmt.Println("Hashcache not found.")
+		fmt.Println("Dupfile not found.")
 	} else if err := json.Unmarshal(rawJson, &ths.data); err != nil {
 		panic(err)
 	}
