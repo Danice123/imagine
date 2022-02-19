@@ -17,10 +17,21 @@ import (
 )
 
 func (ths *CollectionHandler) MD5Hash(input *Image) (string, error) {
+	stat, err := os.Stat(input.FullPath)
+	if err != nil {
+		return "", err
+	}
+
+	if stat.Size() > 1000000000 {
+		println(input.FullPath + " too big")
+		return "Too Big", nil
+	}
+
 	file, err := os.ReadFile(input.FullPath)
 	if err != nil {
 		return "", err
 	}
+
 	hasher := md5.New()
 	hasher.Write(file)
 	return hex.EncodeToString(hasher.Sum(nil)), nil
