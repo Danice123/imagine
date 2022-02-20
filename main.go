@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/Danice123/imagine/collection"
 	"github.com/Danice123/imagine/endpoint"
@@ -12,7 +13,8 @@ import (
 
 func main() {
 	endpoint.COLLECTIONHANDLER = &collection.CollectionHandler{}
-	endpoint.COLLECTIONHANDLER.Initialize(os.Args[2])
+	println(filepath.Base(os.Args[2]))
+	endpoint.COLLECTIONHANDLER.Initialize(filepath.Base(os.Args[2]))
 
 	router := httprouter.New()
 
