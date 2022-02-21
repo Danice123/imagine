@@ -73,7 +73,9 @@ func (ths *SeriesManager) AddImageToSeries(hash string, change string) {
 	}
 	ths.hashToSeries[hash] = change
 	if _, ok := ths.Series[change]; !ok {
-		ths.Series[change].Images = []string{hash}
+		ths.Series[change] = &SeriesData{
+			Images: []string{hash},
+		}
 	} else {
 		ths.Series[change].Images = append(ths.Series[change].Images, hash)
 	}
