@@ -21,7 +21,7 @@ type Image struct {
 
 func (ths *Image) processMime() {
 	if mime, err := mimetype.DetectFile(ths.FullPath); err != nil {
-		fmt.Fprintf(os.Stderr, "File (%s) does not exist or is not readable", ths.FullPath)
+		fmt.Fprintf(os.Stderr, "File (%s) does not exist or is not readable\n", ths.FullPath)
 	} else {
 		ths.mimetype = mime
 	}

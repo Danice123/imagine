@@ -50,9 +50,10 @@ func DupCompare(w http.ResponseWriter, req *http.Request, ps httprouter.Params) 
 	}
 
 	images := []DupImage{}
+
 	for _, path := range imageList {
 		image := COLLECTIONHANDLER.Image(path)
-		if image.IsValid() {
+		if image.IsValid() && !image.IsDir() {
 			images = append(images, DupImage{
 				Path:    path,
 				IsVideo: image.IsVideo(),
