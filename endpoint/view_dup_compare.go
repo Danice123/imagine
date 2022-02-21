@@ -52,10 +52,12 @@ func DupCompare(w http.ResponseWriter, req *http.Request, ps httprouter.Params) 
 	images := []DupImage{}
 	for _, path := range imageList {
 		image := COLLECTIONHANDLER.Image(path)
-		images = append(images, DupImage{
-			Path:    path,
-			IsVideo: image.IsVideo(),
-		})
+		if image.IsValid() {
+			images = append(images, DupImage{
+				Path:    path,
+				IsVideo: image.IsVideo(),
+			})
+		}
 	}
 
 	var tagTemplate = template.New("DupCompare")
