@@ -42,7 +42,13 @@ func DupsView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	for hash, hashList := range phashset {
 		images := []string{}
 		for _, hash := range hashList {
-			images = append(images, COLLECTIONHANDLER.HashCache().GetImagePathByHash(hash))
+			path := COLLECTIONHANDLER.HashCache().GetImagePathByHash(hash)
+			if path != "" {
+				images = append(images, COLLECTIONHANDLER.HashCache().GetImagePathByHash(hash))
+			}
+		}
+		if len(images) < 2 {
+			continue
 		}
 		sort.Strings(images)
 
