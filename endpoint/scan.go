@@ -69,7 +69,7 @@ func Scan(conn *websocket.Conn) {
 	for i := 0; i < len(images); i++ {
 		if req.ScanAll || checkHash(images[i]) {
 			if hash, err := hashFunc(images[i]); err != nil {
-				fmt.Fprintf(os.Stderr, "error for image %s: %s", images[i].FullPath, err.Error())
+				fmt.Fprintf(os.Stderr, "error for image %s: %s\n", images[i].FullPath, err.Error())
 			} else {
 				writeHash(images[i], hash)
 			}

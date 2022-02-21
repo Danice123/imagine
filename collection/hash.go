@@ -17,16 +17,6 @@ import (
 )
 
 func (ths *CollectionHandler) MD5Hash(input *Image) (string, error) {
-	stat, err := os.Stat(input.FullPath)
-	if err != nil {
-		return "", err
-	}
-
-	if stat.Size() > 1000000000 {
-		println(input.FullPath + " too big")
-		return "Too Big", nil
-	}
-
 	file, err := os.ReadFile(input.FullPath)
 	if err != nil {
 		return "", err
@@ -76,6 +66,7 @@ func (ths *CollectionHandler) ExtractFrame(image *Image) string {
 	}
 
 	output := filepath.Join(ths.rootDirectory, "temp", filepath.Base(image.RelativePath))
+	output = strings.TrimSuffix(output, filepath.Ext(output)) + ".png"
 	cmd := exec.Command("ffmpeg",
 		"-y",
 		"-i", image.FullPath,
