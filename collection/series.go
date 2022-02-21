@@ -6,16 +6,21 @@ import (
 )
 
 type SeriesManager struct {
-	Series map[string][]string
+	Series map[string]*SeriesData
 
 	hashToSeries map[string]string
 	path         string
 }
 
+type SeriesData struct {
+	Images []string
+	Tags   map[string]struct{}
+}
+
 func (ths *SeriesManager) Initialize() {
 	ths.hashToSeries = map[string]string{}
-	for s, list := range ths.Series {
-		for _, hash := range list {
+	for s, data := range ths.Series {
+		for _, hash := range data.Images {
 			ths.hashToSeries[hash] = s
 		}
 	}
@@ -29,18 +34,18 @@ func (ths *SeriesManager) IsImageInSeries(image *Image) (string, bool) {
 func (ths *SeriesManager) NextImageHashInSeries(image *Image, direction int) string {
 	if s, ok := ths.hashToSeries[image.MD5()]; ok {
 		i := 0
-		for ; i < len(ths.Series[s]); i++ {
-			if ths.Series[s][i] == image.MD5() {
+		for ; i < len(ths.Series[s].Images); i++ {
+			if ths.Series[s].Images[i] == image.MD5() {
 				break
 			}
 		}
-		if direction > 0 && i == len(ths.Series[s])-1 {
+		if direction > 0 && i == len(ths.Series[s].Images)-1 {
 			return ""
 		}
 		if direction < 0 && i == 0 {
 			return ""
 		}
-		return ths.Series[s][i+direction]
+		return ths.Series[s].Images[i+direction]
 	}
 	return ""
 }
@@ -48,13 +53,13 @@ func (ths *SeriesManager) NextImageHashInSeries(image *Image, direction int) str
 func (ths *SeriesManager) RemoveImageFromSeries(hash string, change string) {
 	delete(ths.hashToSeries, hash)
 	newL := []string{}
-	for _, h := range ths.Series[change] {
+	for _, h := range ths.Series[change].Images {
 		if h != hash {
 			newL = append(newL, h)
 		}
 	}
-	ths.Series[change] = newL
-	if len(ths.Series[change]) == 0 {
+	ths.Series[change].Images = newL
+	if len(ths.Series[change].Images) == 0 {
 		delete(ths.Series, change)
 	}
 }
@@ -68,9 +73,9 @@ func (ths *SeriesManager) AddImageToSeries(hash string, change string) {
 	}
 	ths.hashToSeries[hash] = change
 	if _, ok := ths.Series[change]; !ok {
-		ths.Series[change] = []string{hash}
+		ths.Series[change].Images = []string{hash}
 	} else {
-		ths.Series[change] = append(ths.Series[change], hash)
+		ths.Series[change].Images = append(ths.Series[change].Images, hash)
 	}
 }
 

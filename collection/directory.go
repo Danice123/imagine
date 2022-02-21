@@ -33,11 +33,20 @@ func (ths *Directory) TagListing() map[string]int {
 	tagMap := map[string]int{}
 	hashDir := ths.collection.HashDirectory()
 	hashCache := ths.collection.HashCache()
+	seriesMan := ths.collection.Series()
 	for _, image := range ths.Contents() {
-		md5 := hashCache.Hash(image)
-		if data := hashDir.Data(md5); data != nil {
-			for tag := range data.Tags {
-				tagMap[tag] = tagMap[tag] + 1
+		if series, ok := seriesMan.IsImageInSeries(image); ok {
+			if seriesMan.Series[series].Tags != nil {
+				for tag := range seriesMan.Series[series].Tags {
+					tagMap[tag] = tagMap[tag] + 1
+				}
+			}
+		} else {
+			md5 := hashCache.Hash(image)
+			if data := hashDir.Data(md5); data != nil {
+				for tag := range data.Tags {
+					tagMap[tag] = tagMap[tag] + 1
+				}
 			}
 		}
 	}

@@ -24,7 +24,7 @@ func (ths *CollectionIterator) FindNextFile(direction int) *Image {
 			}
 		} else {
 			for i, image := range ths.Images {
-				if image.MD5() == ths.series.Series[series][0] {
+				if image.MD5() == ths.series.Series[series].Images[0] {
 					ths.currentFile = i
 				}
 			}
@@ -64,7 +64,7 @@ func (ths *CollectionIterator) FindNextFile(direction int) *Image {
 			continue
 		}
 		if series, ok := ths.series.IsImageInSeries(ths.Images[n]); ok {
-			if ths.series.Series[series][0] != ths.Images[n].MD5() {
+			if ths.series.Series[series].Images[0] != ths.Images[n].MD5() {
 				n += direction
 				continue
 			}

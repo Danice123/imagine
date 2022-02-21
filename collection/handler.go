@@ -78,6 +78,7 @@ func (ths *CollectionHandler) Tags() *TagHandler {
 	}
 	tagHandler.hc = ths.HashCache()
 	tagHandler.hd = ths.HashDirectory()
+	tagHandler.sh = ths.Series()
 	return tagHandler
 }
 
