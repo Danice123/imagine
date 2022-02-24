@@ -67,15 +67,32 @@ func (ths *CollectionHandler) HashDirectory() *HashDirectory {
 	return ths.hd
 }
 
-func (ths *CollectionHandler) Tags() *TagHandler {
+func (ths *CollectionHandler) Tags(contextPath string) *TagHandler {
 	tagHandler := &TagHandler{}
 	if rawJson, err := os.ReadFile(filepath.Join(ths.rootDirectory, ".tags.json")); err != nil {
-		fmt.Println("Tag file not found")
+		fmt.Println("Main Tag file not found")
 	} else {
 		if err := json.Unmarshal(rawJson, tagHandler); err != nil {
 			panic(err)
 		}
 	}
+
+	for folder := filepath.Dir(contextPath); folder != "/"; folder = filepath.Dir(folder) {
+		folderTagFile := filepath.Join(ths.rootDirectory, folder, ".tags.json")
+		if _, err := os.Stat(folderTagFile); err == nil {
+			if rawJson, err := os.ReadFile(folderTagFile); err != nil {
+				fmt.Printf("%s had read error\n", folderTagFile)
+			} else {
+				var additionalTags TagHandler
+				if err := json.Unmarshal(rawJson, &additionalTags); err != nil {
+					panic(err)
+				}
+				tagHandler.concat(&additionalTags)
+			}
+
+		}
+	}
+
 	tagHandler.hc = ths.HashCache()
 	tagHandler.hd = ths.HashDirectory()
 	tagHandler.sh = ths.Series()

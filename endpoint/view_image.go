@@ -85,7 +85,7 @@ func ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 		iterator = dir.Iterator(image, collection.SortByName)
 	}
 
-	tagHandler := COLLECTIONHANDLER.Tags()
+	tagHandler := COLLECTIONHANDLER.Tags(image.RelativePath)
 	if query.Get("filter") != "" {
 		for _, filter := range query["filter"] {
 			iterator.Filters = append(iterator.Filters, &TagFilter{

@@ -18,6 +18,10 @@ type TagHandler struct {
 	sh *SeriesManager
 }
 
+func (ths *TagHandler) concat(add *TagHandler) {
+	ths.Tags = append(ths.Tags, add.Tags...)
+}
+
 func (ths *TagHandler) Get(image *Image) []Tag {
 	tags := []Tag{}
 	imageTags := map[string]struct{}{}

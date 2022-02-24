@@ -25,7 +25,7 @@ func ToggleTag(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	tags := COLLECTIONHANDLER.Tags()
+	tags := COLLECTIONHANDLER.Tags(image.RelativePath)
 	tags.WriteTag(image, tagName)
 	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }
