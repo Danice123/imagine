@@ -1,6 +1,7 @@
 package collection
 
 import (
+	"bufio"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -17,13 +18,16 @@ import (
 )
 
 func (ths *CollectionHandler) MD5Hash(input *Image) (string, error) {
-	file, err := os.ReadFile(input.FullPath)
+	file, err := os.Open(input.FullPath)
 	if err != nil {
 		return "", err
 	}
-
+	r := bufio.NewReader(file)
 	hasher := md5.New()
-	hasher.Write(file)
+	_, err = r.WriteTo(hasher)
+	if err != nil {
+		return "", err
+	}
 	return hex.EncodeToString(hasher.Sum(nil)), nil
 }
 
