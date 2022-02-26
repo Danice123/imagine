@@ -52,6 +52,21 @@ img.fullscreen {
   width: 100%;
 }
 
+#faceCanvas {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  margin: auto;
+  z-index: 2147483600;
+}
+
+.facebox {
+  fill-opacity: 0;
+  stroke: red;
+  stroke-width: 5px;
+}
+
 svg {
   fill: white;
 }

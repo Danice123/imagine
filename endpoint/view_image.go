@@ -38,6 +38,7 @@ type ImageData struct {
 	Hash        string
 	ShowTags    bool
 	Tags        []collection.Tag
+	Faces       map[string]collection.FaceBox
 	Series      []string
 }
 
@@ -110,6 +111,11 @@ func ImageView(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	data.Hash = image.MD5()
 	imageSeries, _ := series.IsImageInSeries(image)
 	data.ImageSeries = imageSeries
+
+	hdd := COLLECTIONHANDLER.HashDirectory().Data(data.Hash)
+	if hdd != nil && hdd.Faces != nil {
+		data.Faces = hdd.Faces
+	}
 
 	next := iterator.FindNextFile(1)
 	if next != nil {

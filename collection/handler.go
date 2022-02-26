@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/service/rekognition"
 )
 
 type CollectionHandler struct {
@@ -14,6 +16,8 @@ type CollectionHandler struct {
 
 	hc *HashCache
 	hd *HashDirectory
+
+	Rekog *rekognition.Client
 }
 
 func (ths *CollectionHandler) Initialize(root string) {

@@ -15,7 +15,18 @@
         <source src="/raw{{ .Url }}" type="{{ .Image.Mimetype }}" />
       </video>
     {{ else }}
-      <img id="media" src="/raw{{ .Url }}" />
+      <div>
+        <img id="media" src="/raw{{ .Url }}" />
+        {{ if .Faces }}
+          <svg id="faceCanvas">
+            {{ range $name, $box := .Faces }}
+              <rect class="facebox" data="{{ $name }}" x="{{ $box.X }}%" y="{{ $box.Y }}%" width="{{ $box.Width }}%" height="{{ $box.Height }}%">
+                <title>{{ $name }}</title>
+              </rect>
+            {{ end }}
+          </svg>
+        {{ end }}
+      </div>
     {{ end }}
 
 
@@ -210,6 +221,27 @@
     <script>
       function changeSeries() {
         window.location.href = "/api/changeseries?hash={{ .Hash }}&series=" + document.getElementById("seriesInput").value
+      }
+    </script>
+    <script>
+      var image = document.getElementById('media')
+      var svg = document.getElementById('faceCanvas')
+      svg.style.top = image.style.top
+      svg.style.width = image.clientWidth
+      svg.style.height = image.clientHeight
+      window.addEventListener('resize', function(event){
+        svg.style.top = image.style.top
+        svg.style.width = image.clientWidth
+        svg.style.height = image.clientHeight
+      });
+
+      var faces = document.getElementsByClassName("facebox")
+      document.oncontextmenu = function(event) {
+        if (event.target.getAttribute("class") == "facebox") {
+          alert(event.target.getAttribute("data"))
+          return false
+        }
+        return true
       }
     </script>
   </body>
