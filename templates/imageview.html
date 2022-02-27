@@ -203,7 +203,7 @@
 			const urlParams = new URLSearchParams(window.location.search);
 			if (urlParams.get("timer") != null) {
 				setTimeout(function() {
-					window.location.href = "{{.Next}}?{{.QueryString}}"
+          window.location.href = document.getElementById("next").getAttribute("href")
 				}, urlParams.get("timer"))
 			}
 		</script>
