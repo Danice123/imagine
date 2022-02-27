@@ -204,7 +204,7 @@
 			if (urlParams.get("timer") != null) {
 				setTimeout(function() {
           window.location.href = document.getElementById("next").getAttribute("href")
-				}, urlParams.get("timer"))
+				}, urlParams.get("timer") * 1000)
 			}
 		</script>
     <script>
