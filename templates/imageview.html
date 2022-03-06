@@ -28,7 +28,11 @@
 								width="{{ $box.Width }}%"
 								height="{{ $box.Height }}%"
 							>
-								<title>{{ $name }}</title>
+								{{ if $box.Name }}
+									<title>{{ $box.Name }}</title>
+								{{ else }}
+									<title>{{ $name }}</title>
+								{{ end }}
 							</rect>
 						{{ end }}
 					</svg>
@@ -39,8 +43,7 @@
 					image-url="{{ .Url }}"
 				>
 					<a id="viewFace" class="dropdown-item" href="#">View Face</a>
-					<a class="dropdown-item" href="#">Another action</a>
-					<a class="dropdown-item" href="#">Something else here</a>
+					<a id="searchFace" class="dropdown-item" href="#">Search Face</a>
 				</div>
 			</div>
 		{{ end }}

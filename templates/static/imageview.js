@@ -72,6 +72,13 @@ $("#context-menu #viewFace").on("click", function (e) {
 	return false;
 });
 
+$("#context-menu #searchFace").on("click", function (e) {
+	let menu = $(e.target).parent();
+	window.location.href =
+		"/api/aws/recognize" + menu.attr("image-url") + "?face=" + menu.attr("data");
+	return false;
+});
+
 $("#context-menu a").on("click", function () {
 	$(this).parent().hide();
 });

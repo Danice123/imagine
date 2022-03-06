@@ -9,6 +9,7 @@ import (
 )
 
 type FaceBox struct {
+	Name   *string
 	X      int
 	Y      int
 	Width  int

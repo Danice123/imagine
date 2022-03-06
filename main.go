@@ -57,6 +57,8 @@ func main() {
 	router.GET("/api/markasnotdup", endpoint.MarkAsNotDup)
 
 	router.GET("/api/aws/detectface/*path", endpoint.DetectFaces)
+	router.GET("/api/aws/addperson/*path", endpoint.AddNewPerson)
+	router.GET("/api/aws/recognize/*path", endpoint.RecognizeFace)
 
 	static := http.FileServer(http.Dir("./templates/static"))
 	router.Handler("GET", "/static/*path", http.StripPrefix("/static/", static))

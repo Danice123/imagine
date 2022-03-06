@@ -123,6 +123,20 @@ func (ths *CollectionHandler) Duplicate() *DuplicateManager {
 	return dm
 }
 
+func (ths *CollectionHandler) RecognitionEngine() *RecognitionEngine {
+	re := &RecognitionEngine{path: filepath.Join(ths.rootDirectory, ".recognition.json"), rekog: ths.Rekog}
+	if rawJson, err := os.ReadFile(filepath.Join(ths.rootDirectory, ".recognition.json")); err != nil {
+		re.Initialize()
+		return re
+	} else {
+		if err := json.Unmarshal(rawJson, re); err != nil {
+			panic(err)
+		}
+	}
+	re.Initialize()
+	return re
+}
+
 func (ths *CollectionHandler) Trash() string {
 	trashDir := filepath.Join(ths.rootDirectory, "trash")
 	if _, err := os.Stat(trashDir); err != nil {
