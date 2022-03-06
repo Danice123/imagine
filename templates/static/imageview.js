@@ -75,7 +75,10 @@ $("#context-menu #viewFace").on("click", function (e) {
 $("#context-menu #searchFace").on("click", function (e) {
 	let menu = $(e.target).parent();
 	window.location.href =
-		"/api/aws/recognize" + menu.attr("image-url") + "?face=" + menu.attr("data");
+		"/api/aws/recognize" +
+		menu.attr("image-url") +
+		"?face=" +
+		menu.attr("data");
 	return false;
 });
 
