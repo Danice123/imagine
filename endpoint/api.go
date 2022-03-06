@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/Danice123/imagine/collection"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -75,38 +74,4 @@ func CleanImages(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 		}
 	}
 	w.Write([]byte(strconv.Itoa(count)))
-}
-
-func DetectFaces(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	image := COLLECTIONHANDLER.Image(ps.ByName("path"))
-	if !image.IsValid() {
-		http.Error(w, "Not Found", http.StatusNotFound)
-		return
-	}
-	if image.IsDir() {
-		http.Error(w, "Api call on directory not valid", http.StatusBadRequest)
-		return
-	}
-
-	faces, err := image.DetectFaces()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	hd := COLLECTIONHANDLER.HashDirectory()
-	for i, face := range faces {
-		data := hd.Data(image.MD5())
-		if data == nil {
-			data = hd.CreateData(image.MD5())
-		}
-
-		if data.Faces == nil {
-			data.Faces = map[string]collection.FaceBox{}
-		}
-		data.Faces["UNKNOWN"+strconv.Itoa(i)] = face
-	}
-	hd.Save()
-
-	http.Redirect(w, req, req.Referer(), http.StatusFound)
 }

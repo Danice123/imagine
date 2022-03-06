@@ -1,248 +1,219 @@
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
-      crossorigin="anonymous"
-    />
-    <link href="/static/imageview.css" rel="stylesheet" />
-  </head>
-  <body>
-    {{ if .Image.IsVideo }}
-      <video id="media" autoplay loop>
-        <source src="/raw{{ .Url }}" type="{{ .Image.Mimetype }}" />
-      </video>
-    {{ else }}
-      <div>
-        <img id="media" src="/raw{{ .Url }}" />
-        {{ if .Faces }}
-          <svg id="faceCanvas">
-            {{ range $name, $box := .Faces }}
-              <rect class="facebox" data="{{ $name }}" x="{{ $box.X }}%" y="{{ $box.Y }}%" width="{{ $box.Width }}%" height="{{ $box.Height }}%">
-                <title>{{ $name }}</title>
-              </rect>
-            {{ end }}
-          </svg>
-        {{ end }}
-      </div>
-    {{ end }}
+	<head>
+		<meta name="viewport" content="width=device-width" />
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+			crossorigin="anonymous"
+		/>
+		<link href="/static/imageview.css" rel="stylesheet" />
+	</head>
+	<body>
+		{{ if .Image.IsVideo }}
+			<video id="media" autoplay loop>
+				<source src="/raw{{ .Url }}" type="{{ .Image.Mimetype }}" />
+			</video>
+		{{ else }}
+			<div>
+				<img id="media" src="/raw{{ .Url }}" />
+				{{ if .Faces }}
+					<svg id="faceCanvas">
+						{{ range $name, $box := .Faces }}
+							<rect
+								class="facebox"
+								data="{{ $name }}"
+								x="{{ $box.X }}%"
+								y="{{ $box.Y }}%"
+								width="{{ $box.Width }}%"
+								height="{{ $box.Height }}%"
+							>
+								<title>{{ $name }}</title>
+							</rect>
+						{{ end }}
+					</svg>
+				{{ end }}
+				<div class="dropdown-menu dropdown-menu-sm" id="context-menu">
+					<a class="dropdown-item" href="#">Action</a>
+					<a class="dropdown-item" href="#">Another action</a>
+					<a class="dropdown-item" href="#">Something else here</a>
+				</div>
+			</div>
+		{{ end }}
 
 
-    <div id="previous_button">
-      <a id="previous" href="/browse{{ .Previous }}?{{ .QueryString }}">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          enable-background="new 0 0 32 32"
-          version="1.1"
-          viewBox="0 0 32 32"
-          xml:space="preserve"
-        >
-          <g id="Double_Chevron">
-            <path
-              d="M10.725,6.287c-0.395-0.394-1.036-0.394-1.431,0l-9.002,8.999c-0.39,0.389-0.39,1.039,0,1.429l9.002,8.999   c0.395,0.394,1.035,0.394,1.431,0c0.395-0.394,0.395-1.034,0-1.428L2.437,16l8.287-8.285C11.12,7.321,11.12,6.681,10.725,6.287z"
-            />
-          </g>
-        </svg>
-      </a>
-    </div>
+		<div id="previous_button">
+			<a id="previous" href="/browse{{ .Previous }}?{{ .QueryString }}">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink"
+					enable-background="new 0 0 32 32"
+					version="1.1"
+					viewBox="0 0 32 32"
+					xml:space="preserve"
+				>
+					<g id="Double_Chevron">
+						<path
+							d="M10.725,6.287c-0.395-0.394-1.036-0.394-1.431,0l-9.002,8.999c-0.39,0.389-0.39,1.039,0,1.429l9.002,8.999   c0.395,0.394,1.035,0.394,1.431,0c0.395-0.394,0.395-1.034,0-1.428L2.437,16l8.287-8.285C11.12,7.321,11.12,6.681,10.725,6.287z"
+						/>
+					</g>
+				</svg>
+			</a>
+		</div>
 
-    <div id="next_button">
-      <a id="next" href="/browse{{ .Next }}?{{ .QueryString }}">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          enable-background="new 0 0 32 32"
-          version="1.1"
-          viewBox="0 0 32 32"
-          xml:space="preserve"
-        >
-          <g id="Double_Chevron">
-            <path
-              d="M31.708,15.286l-9.002-8.999c-0.395-0.394-1.035-0.394-1.431,0c-0.395,0.394-0.395,1.034,0,1.428L29.563,16   l-8.287,8.285c-0.395,0.394-0.395,1.034,0,1.429c0.395,0.394,1.036,0.394,1.431,0l9.002-8.999   C32.097,16.325,32.097,15.675,31.708,15.286z"
-            />
-          </g>
-        </svg>
-      </a>
-      <a class="adds" href="/api/random">
-        <svg
-          class="random_on_{{ .RandomState }}"
-          version="1.1"
-          id="randomIcon"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          viewBox="0 0 512 512"
-          enable-background="new 0 0 512 512"
-          xml:space="preserve"
-        >
-          <g id="_x23_231f20ff">
-            <path
-              d="M409.434,82.96c30.04,25.7,60.08,51.42,89.971,77.29c-29.49,26.511-60.15,51.851-90.101,77.9		c0.07-17.43-0.11-34.851,0.061-52.271c-19,0.03-38-0.109-56.99,0.061c-9.13,0.02-17.72,4.58-23.87,11.16		c-54.55,56.779-109.21,113.46-163.74,170.26c-6.06,6.29-14.51,10.4-23.34,10.32c-34.689,0.22-69.39-0.17-104.069,0.229		c-12.891-0.38-23.95-12.06-23.94-24.89c-0.64-13.91,11.62-25.9,25.28-26.311c27.55-0.26,55.13,0.15,82.68-0.189		c10.05-0.061,18.9-5.92,25.24-13.32c53.72-55.939,107.5-111.83,161.25-167.75c6.04-6.59,14.72-10.65,23.68-10.85		c25.939-0.11,51.89,0.1,77.82-0.101C409.313,117.32,409.174,100.141,409.434,82.96z"
-            />
-            <path
-              d="M32.764,134.48c37.5-0.311,75.131,0.03,112.69-0.08c9.68-0.43,19.54,3.2,26.12,10.43		c15.609,16.061,31.05,32.311,46.57,48.46c6.359,6.5,9.85,15.96,7.64,24.98c-2.41,11.04-12.98,19.819-24.36,19.71		c-7.729,0.35-14.85-3.59-20.54-8.48c-10.64-11.34-20.84-23.12-31.649-34.31c-6.19-6.3-15.09-9.41-23.83-9.29		c-27.99-0.12-55.98,0.08-83.971-0.09c-11.14-0.34-23.02-5.601-27.13-16.66C7.974,155.07,17.654,137.19,32.764,134.48z"
-            />
-            <path
-              d="M261.554,278.17c9.67-7.729,24.83-6.609,33.36,2.32c11.689,11.98,23.13,24.21,34.83,36.18		c6.08,6.41,14.84,10.07,23.67,9.98c18.66-0.07,37.319,0.08,55.99-0.09c-0.19-17.11-0.07-34.221-0.04-51.33		c30.27,25.64,60.31,51.55,90.3,77.52c-29.95,25.95-60.061,51.71-90.221,77.41c-0.38-17.5,0.04-35.01-0.189-52.51		c-25.97-0.24-51.94-0.021-77.91-0.11c-8.95-0.08-17.57-4.35-23.56-10.91c-16.73-17.27-33.73-34.27-50.29-51.689		C247.904,304.471,250.034,286.36,261.554,278.17z"
-            />
-          </g>
-        </svg>
-      </a>
-      <a class="adds" href="/">
-        <svg
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          viewBox="0 0 460.298 460.297"
-          enable-background="new 0 0 460.298 460.297"
-          xml:space="preserve"
-        >
-          <g>
-            <g>
-              <path
-                d="M230.149,120.939L65.986,256.274c0,0.191-0.048,0.472-0.144,0.855c-0.094,0.38-0.144,0.656-0.144,0.852v137.041			c0,4.948,1.809,9.236,5.426,12.847c3.616,3.613,7.898,5.431,12.847,5.431h109.63V303.664h73.097v109.64h109.629			c4.948,0,9.236-1.814,12.847-5.435c3.617-3.607,5.432-7.898,5.432-12.847V257.981c0-0.76-0.104-1.334-0.288-1.707L230.149,120.939			z"
-              />
-              <path
-                d="M457.122,225.438L394.6,173.476V56.989c0-2.663-0.856-4.853-2.574-6.567c-1.704-1.712-3.894-2.568-6.563-2.568h-54.816			c-2.666,0-4.855,0.856-6.57,2.568c-1.711,1.714-2.566,3.905-2.566,6.567v55.673l-69.662-58.245			c-6.084-4.949-13.318-7.423-21.694-7.423c-8.375,0-15.608,2.474-21.698,7.423L3.172,225.438c-1.903,1.52-2.946,3.566-3.14,6.136			c-0.193,2.568,0.472,4.811,1.997,6.713l17.701,21.128c1.525,1.712,3.521,2.759,5.996,3.142c2.285,0.192,4.57-0.476,6.855-1.998			L230.149,95.817l197.57,164.741c1.526,1.328,3.521,1.991,5.996,1.991h0.858c2.471-0.376,4.463-1.43,5.996-3.138l17.703-21.125			c1.522-1.906,2.189-4.145,1.991-6.716C460.068,229.007,459.021,226.961,457.122,225.438z"
-              />
-            </g>
-          </g>
-        </svg>
-      </a>
-      <a class="adds" href="/tags{{ .Path }}">
-        <svg
-          enable-background="new 0 0 32 32"
-          version="1.1"
-          viewBox="0 0 32 32"
-          xml:space="preserve"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-        >
-          <g id="tag">
-            <path
-              clip-rule="evenodd"
-              d="M31.391,13.883l-5-8c-0.73-1.169-2.012-1.88-3.391-1.88H4   c-2.209,0-4,1.791-4,4v16c0,2.209,1.791,4,4,4h19c1.379,0,2.66-0.711,3.391-1.881l5-8C32.203,16.827,32.203,15.18,31.391,13.883z    M29.695,17.062l-5,8.002c-0.367,0.588-1.002,0.939-1.695,0.939H4c-1.103,0-2-0.898-2-2v-16c0-1.103,0.897-2,2-2h19   c0.693,0,1.328,0.352,1.695,0.939l5,8C30.098,15.587,30.098,16.419,29.695,17.062z"
-              fill-rule="evenodd"
-            />
-            <path
-              clip-rule="evenodd"
-              d="M23,13.003c-1.658,0-3,1.343-3,3c0,1.657,1.342,3,3,3   c1.656,0,3-1.344,3-3C26,14.346,24.656,13.003,23,13.003z M23,18.004c-1.105,0-2-0.896-2-2c0-1.104,0.895-2,2-2   c1.104,0,2,0.896,2,2C25,17.107,24.104,18.004,23,18.004z"
-              fill-rule="evenodd"
-            />
-          </g>
-        </svg>
-      </a>
-      <a class="adds" href="/api/editing">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path
-            d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
-          />
-        </svg>
-      </a>
-    </div>
+		<div id="next_button">
+			<a id="next" href="/browse{{ .Next }}?{{ .QueryString }}">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink"
+					enable-background="new 0 0 32 32"
+					version="1.1"
+					viewBox="0 0 32 32"
+					xml:space="preserve"
+				>
+					<g id="Double_Chevron">
+						<path
+							d="M31.708,15.286l-9.002-8.999c-0.395-0.394-1.035-0.394-1.431,0c-0.395,0.394-0.395,1.034,0,1.428L29.563,16   l-8.287,8.285c-0.395,0.394-0.395,1.034,0,1.429c0.395,0.394,1.036,0.394,1.431,0l9.002-8.999   C32.097,16.325,32.097,15.675,31.708,15.286z"
+						/>
+					</g>
+				</svg>
+			</a>
+			<a class="adds" href="/api/random">
+				<svg
+					class="random_on_{{ .RandomState }}"
+					version="1.1"
+					id="randomIcon"
+					xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink"
+					viewBox="0 0 512 512"
+					enable-background="new 0 0 512 512"
+					xml:space="preserve"
+				>
+					<g id="_x23_231f20ff">
+						<path
+							d="M409.434,82.96c30.04,25.7,60.08,51.42,89.971,77.29c-29.49,26.511-60.15,51.851-90.101,77.9		c0.07-17.43-0.11-34.851,0.061-52.271c-19,0.03-38-0.109-56.99,0.061c-9.13,0.02-17.72,4.58-23.87,11.16		c-54.55,56.779-109.21,113.46-163.74,170.26c-6.06,6.29-14.51,10.4-23.34,10.32c-34.689,0.22-69.39-0.17-104.069,0.229		c-12.891-0.38-23.95-12.06-23.94-24.89c-0.64-13.91,11.62-25.9,25.28-26.311c27.55-0.26,55.13,0.15,82.68-0.189		c10.05-0.061,18.9-5.92,25.24-13.32c53.72-55.939,107.5-111.83,161.25-167.75c6.04-6.59,14.72-10.65,23.68-10.85		c25.939-0.11,51.89,0.1,77.82-0.101C409.313,117.32,409.174,100.141,409.434,82.96z"
+						/>
+						<path
+							d="M32.764,134.48c37.5-0.311,75.131,0.03,112.69-0.08c9.68-0.43,19.54,3.2,26.12,10.43		c15.609,16.061,31.05,32.311,46.57,48.46c6.359,6.5,9.85,15.96,7.64,24.98c-2.41,11.04-12.98,19.819-24.36,19.71		c-7.729,0.35-14.85-3.59-20.54-8.48c-10.64-11.34-20.84-23.12-31.649-34.31c-6.19-6.3-15.09-9.41-23.83-9.29		c-27.99-0.12-55.98,0.08-83.971-0.09c-11.14-0.34-23.02-5.601-27.13-16.66C7.974,155.07,17.654,137.19,32.764,134.48z"
+						/>
+						<path
+							d="M261.554,278.17c9.67-7.729,24.83-6.609,33.36,2.32c11.689,11.98,23.13,24.21,34.83,36.18		c6.08,6.41,14.84,10.07,23.67,9.98c18.66-0.07,37.319,0.08,55.99-0.09c-0.19-17.11-0.07-34.221-0.04-51.33		c30.27,25.64,60.31,51.55,90.3,77.52c-29.95,25.95-60.061,51.71-90.221,77.41c-0.38-17.5,0.04-35.01-0.189-52.51		c-25.97-0.24-51.94-0.021-77.91-0.11c-8.95-0.08-17.57-4.35-23.56-10.91c-16.73-17.27-33.73-34.27-50.29-51.689		C247.904,304.471,250.034,286.36,261.554,278.17z"
+						/>
+					</g>
+				</svg>
+			</a>
+			<a class="adds" href="/">
+				<svg
+					version="1.1"
+					xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink"
+					viewBox="0 0 460.298 460.297"
+					enable-background="new 0 0 460.298 460.297"
+					xml:space="preserve"
+				>
+					<g>
+						<g>
+							<path
+								d="M230.149,120.939L65.986,256.274c0,0.191-0.048,0.472-0.144,0.855c-0.094,0.38-0.144,0.656-0.144,0.852v137.041			c0,4.948,1.809,9.236,5.426,12.847c3.616,3.613,7.898,5.431,12.847,5.431h109.63V303.664h73.097v109.64h109.629			c4.948,0,9.236-1.814,12.847-5.435c3.617-3.607,5.432-7.898,5.432-12.847V257.981c0-0.76-0.104-1.334-0.288-1.707L230.149,120.939			z"
+							/>
+							<path
+								d="M457.122,225.438L394.6,173.476V56.989c0-2.663-0.856-4.853-2.574-6.567c-1.704-1.712-3.894-2.568-6.563-2.568h-54.816			c-2.666,0-4.855,0.856-6.57,2.568c-1.711,1.714-2.566,3.905-2.566,6.567v55.673l-69.662-58.245			c-6.084-4.949-13.318-7.423-21.694-7.423c-8.375,0-15.608,2.474-21.698,7.423L3.172,225.438c-1.903,1.52-2.946,3.566-3.14,6.136			c-0.193,2.568,0.472,4.811,1.997,6.713l17.701,21.128c1.525,1.712,3.521,2.759,5.996,3.142c2.285,0.192,4.57-0.476,6.855-1.998			L230.149,95.817l197.57,164.741c1.526,1.328,3.521,1.991,5.996,1.991h0.858c2.471-0.376,4.463-1.43,5.996-3.138l17.703-21.125			c1.522-1.906,2.189-4.145,1.991-6.716C460.068,229.007,459.021,226.961,457.122,225.438z"
+							/>
+						</g>
+					</g>
+				</svg>
+			</a>
+			<a class="adds" href="/tags{{ .Path }}">
+				<svg
+					enable-background="new 0 0 32 32"
+					version="1.1"
+					viewBox="0 0 32 32"
+					xml:space="preserve"
+					xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink"
+				>
+					<g id="tag">
+						<path
+							clip-rule="evenodd"
+							d="M31.391,13.883l-5-8c-0.73-1.169-2.012-1.88-3.391-1.88H4   c-2.209,0-4,1.791-4,4v16c0,2.209,1.791,4,4,4h19c1.379,0,2.66-0.711,3.391-1.881l5-8C32.203,16.827,32.203,15.18,31.391,13.883z    M29.695,17.062l-5,8.002c-0.367,0.588-1.002,0.939-1.695,0.939H4c-1.103,0-2-0.898-2-2v-16c0-1.103,0.897-2,2-2h19   c0.693,0,1.328,0.352,1.695,0.939l5,8C30.098,15.587,30.098,16.419,29.695,17.062z"
+							fill-rule="evenodd"
+						/>
+						<path
+							clip-rule="evenodd"
+							d="M23,13.003c-1.658,0-3,1.343-3,3c0,1.657,1.342,3,3,3   c1.656,0,3-1.344,3-3C26,14.346,24.656,13.003,23,13.003z M23,18.004c-1.105,0-2-0.896-2-2c0-1.104,0.895-2,2-2   c1.104,0,2,0.896,2,2C25,17.107,24.104,18.004,23,18.004z"
+							fill-rule="evenodd"
+						/>
+					</g>
+				</svg>
+			</a>
+			<a class="adds" href="/api/editing">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path
+						d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+					/>
+				</svg>
+			</a>
+		</div>
 
-    {{ if .ShowTags }}
-      <div id="tags" class="btn-group-vertical">
-        {{ range .Tags }}
-          {{ if .Valid }}
-            <a
-              class="btn btn-success"
-              href="/api/tag{{ $.Url }}?name={{ .Name }}"
-              >{{ .Name }}</a
-            >
-          {{ else }}
-            <a
-              class="btn btn-danger"
-              href="/api/tag{{ $.Url }}?name={{ .Name }}"
-              >{{ .Name }}</a
-            >
-          {{ end }}
-        {{ end }}
-      </div>
-      <div id="series" class="input-group">
-        <input
-          class="form-control"
-          list="seriesOptions"
-          id="seriesInput"
-          value="{{ .ImageSeries }}"
-        />
-        <datalist id="seriesOptions">
-          {{ range .Series }}
-            <option value="{{ . }}"></option>
-          {{ end }}
-        </datalist>
-        <button
-          class="btn btn-outline-secondary"
-          type="button"
-          onclick="changeSeries()"
-        >
-          Apply
-        </button>
-      </div>
-    {{ end }}    <script>
-			document.addEventListener("keydown", function(e) {
-				switch (e.keyCode) {
-				case 37: // left
-					window.location.href = document.getElementById("previous").getAttribute("href")
-					break;
-				case 39: // right
-					window.location.href = document.getElementById("next").getAttribute("href")
-					break;
-        case 70:
-          let media = document.getElementById("media")
-          switch (media.className) {
-            case "":
-              media.className = "bigscreen"
-              break;
-            case "bigscreen":
-              media.className = "biggerscreen"
-              break;
-            case "biggerscreen":
-              media.className = "fullscreen"
-              break
-            case "fullscreen":
-              media.className = ""
-              break;
-          }
-          break;
-				}
-			})
-		</script>
-		<script>
-			const urlParams = new URLSearchParams(window.location.search);
-			if (urlParams.get("timer") != null) {
-				setTimeout(function() {
-          window.location.href = document.getElementById("next").getAttribute("href")
-				}, urlParams.get("timer") * 1000)
-			}
-		</script>
+		{{ if .ShowTags }}
+			<div id="tags" class="btn-group-vertical">
+				{{ range .Tags }}
+					{{ if .Valid }}
+						<a
+							class="btn btn-success"
+							href="/api/tag{{ $.Url }}?name={{ .Name }}"
+							>{{ .Name }}</a
+						>
+					{{ else }}
+						<a
+							class="btn btn-danger"
+							href="/api/tag{{ $.Url }}?name={{ .Name }}"
+							>{{ .Name }}</a
+						>
+					{{ end }}
+				{{ end }}
+			</div>
+			<div id="series" class="input-group">
+				<input
+					class="form-control"
+					list="seriesOptions"
+					id="seriesInput"
+					value="{{ .ImageSeries }}"
+					autocomplete="off"
+				/>
+				<datalist id="seriesOptions">
+					{{ range .Series }}
+						<option value="{{ . }}"></option>
+					{{ end }}
+				</datalist>
+				<button
+					class="btn btn-outline-secondary"
+					type="button"
+					onclick="changeSeries()"
+				>
+					Apply
+				</button>
+			</div>
+			<div id="rekog" class="input-group">
+				<button
+					class="btn btn-outline-secondary"
+					type="button"
+					onclick="detectFaces()"
+				>
+					Detect Faces
+				</button>
+			</div>
+		{{ end }}		<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+		<script src="/static/imageview.js"></script>
     <script>
       function changeSeries() {
-        window.location.href = "/api/changeseries?hash={{ .Hash }}&series=" + document.getElementById("seriesInput").value
+        window.location.href =
+          "/api/changeseries?hash={{ .Hash }}&series=" + $("#seriesInput").val();
       }
-    </script>
-    <script>
-      var image = document.getElementById('media')
-      var svg = document.getElementById('faceCanvas')
-      svg.style.top = image.style.top
-      svg.style.width = image.clientWidth
-      svg.style.height = image.clientHeight
-      window.addEventListener('resize', function(event){
-        svg.style.top = image.style.top
-        svg.style.width = image.clientWidth
-        svg.style.height = image.clientHeight
-      });
 
-      var faces = document.getElementsByClassName("facebox")
-      document.oncontextmenu = function(event) {
-        if (event.target.getAttribute("class") == "facebox") {
-          alert(event.target.getAttribute("data"))
-          return false
-        }
-        return true
+      function detectFaces() {
+        window.location.href = "/api/aws/detectface{{ $.Url }}";
       }
     </script>
-  </body>
+	</body>
 </html>

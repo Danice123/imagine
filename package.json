@@ -1,11 +1,11 @@
 {
-  "name": "imagine-templates",
-  "scripts": {
-    "fmt": "prettier --write ."
-  },
-  "devDependencies": {
-    "@prettier/plugin-xml": "^1.1.0",
-    "prettier": "^2.5.1",
-    "prettier-plugin-go-template": "^0.0.11"
-  }
+	"name": "imagine-templates",
+	"scripts": {
+		"fmt": "prettier --write ."
+	},
+	"devDependencies": {
+		"@prettier/plugin-xml": "^1.1.0",
+		"prettier": "^2.5.1",
+		"prettier-plugin-go-template": "^0.0.11"
+	}
 }

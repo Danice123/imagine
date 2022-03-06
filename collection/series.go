@@ -18,6 +18,9 @@ type SeriesData struct {
 }
 
 func (ths *SeriesManager) Initialize() {
+	if ths.Series == nil {
+		ths.Series = map[string]*SeriesData{}
+	}
 	ths.hashToSeries = map[string]string{}
 	for s, data := range ths.Series {
 		for _, hash := range data.Images {

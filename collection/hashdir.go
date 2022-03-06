@@ -14,7 +14,7 @@ type HashDirectory struct {
 
 type ImageHashData struct {
 	Tags  map[string]struct{}
-	Faces map[string]FaceBox
+	Faces []FaceBox
 	PHash string
 }
 

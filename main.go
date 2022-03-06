@@ -29,6 +29,10 @@ func main() {
 		Rekog: rekog,
 	}
 	root := strings.TrimSuffix(os.Args[2], "/")
+	_, err := os.Stat(root)
+	if err != nil {
+		panic(err)
+	}
 	endpoint.COLLECTIONHANDLER.Initialize(root)
 
 	router := httprouter.New()
