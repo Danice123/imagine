@@ -55,6 +55,7 @@ $(".facebox").on("contextmenu", function (e) {
 	var top = e.pageY - 10;
 	var left = e.pageX - 90;
 	$("#context-menu")
+		.attr("data", $(e.target).attr("data"))
 		.css({
 			display: "absolute",
 			top: top,
@@ -64,6 +65,17 @@ $(".facebox").on("contextmenu", function (e) {
 	return false;
 });
 
+$("#context-menu #viewFace").on("click", function (e) {
+	let menu = $(e.target).parent();
+	window.location.href =
+		"/face" + menu.attr("image-url") + "?face=" + menu.attr("data");
+	return false;
+});
+
+$("#context-menu a").on("click", function () {
+	$(this).parent().hide();
+});
+
 $(document)
 	.on("click", function () {
 		$("#context-menu").hide();
@@ -71,7 +83,3 @@ $(document)
 	.on("contextmenu", function (e) {
 		$("#context-menu").hide();
 	});
-
-$("#context-menu a").on("click", function () {
-	$(this).parent().hide();
-});

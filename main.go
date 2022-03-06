@@ -39,6 +39,7 @@ func main() {
 
 	router.GET("/", endpoint.Home)
 	router.GET("/raw/*path", endpoint.RawImage)
+	router.GET("/face/*path", endpoint.RawFace)
 	router.GET("/browse/*path", endpoint.ImageView)
 	router.GET("/tags/*path", endpoint.TagView)
 	router.GET("/dups", endpoint.DupsView)

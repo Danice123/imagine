@@ -1,7 +1,9 @@
 package collection
 
 import (
+	"errors"
 	"fmt"
+	"image"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -87,4 +89,35 @@ func (ths *Image) Directory() *Directory {
 
 func (ths *Image) MD5() string {
 	return ths.collection.HashCache().Hash(ths)
+}
+
+func (ths *Image) GetFaceImage(faceId int) (image.Image, error) {
+	hd := ths.collection.HashDirectory()
+	data := hd.Data(ths.MD5())
+	if data == nil || data.Faces == nil || faceId >= len(data.Faces) {
+		return nil, errors.New("no data")
+	}
+	face := data.Faces[faceId]
+
+	file, err := os.Open(ths.FullPath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	i, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
+	}
+
+	x1 := i.Bounds().Max.X * face.X / 100
+	y1 := i.Bounds().Max.Y * face.Y / 100
+	x2 := x1 + i.Bounds().Max.X*face.Width/100
+	y2 := y1 + i.Bounds().Max.Y*face.Height/100
+
+	subI := i.(interface {
+		SubImage(r image.Rectangle) image.Image
+	}).SubImage(image.Rect(x1, y1, x2, y2))
+
+	return subI, nil
 }
