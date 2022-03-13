@@ -22,7 +22,7 @@ func Home(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 			panic(err.Error())
 		} else {
 			homeTemplate.Execute(w, HomeData{
-				Folders: COLLECTIONHANDLER.Folders(),
+				Folders: COLLECTIONHANDLER.Folders("/"),
 			})
 		}
 	}

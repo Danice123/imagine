@@ -38,6 +38,7 @@ func main() {
 	router := httprouter.New()
 
 	router.GET("/", endpoint.Home)
+	router.GET("/nav/*path", endpoint.Dir)
 	router.GET("/raw/*path", endpoint.RawImage)
 	router.GET("/face/*path", endpoint.RawFace)
 	router.GET("/browse/*path", endpoint.ImageView)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,14 +25,14 @@ func (ths *CollectionHandler) Initialize(root string) {
 	ths.rootDirectory = root
 }
 
-func (ths *CollectionHandler) Folders() []string {
+func (ths *CollectionHandler) Folders(path string) []string {
 	folders := []string{}
-	filepath.WalkDir(ths.rootDirectory, func(path string, d fs.DirEntry, err error) error {
+	dir, _ := ioutil.ReadDir(filepath.Join(ths.rootDirectory, path))
+	for _, d := range dir {
 		if d.IsDir() && d.Name() != "trash" && d.Name() != "temp" {
-			folders = append(folders, strings.TrimPrefix(path+"/", ths.rootDirectory))
+			folders = append(folders, d.Name())
 		}
-		return nil
-	})
+	}
 	return folders
 }
 

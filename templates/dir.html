@@ -11,20 +11,18 @@
 	<body>
 		<h1>Browse</h1>
 		<ul class="list-group">
-			<a href="tags/">
+			<a href="/tags{{ .CWD }}">
 				<li class="list-group-item">
 					<span class="h3">/</span>
 				</li>
 			</a>
 			{{ range .Folders }}
-				<a href="nav/{{ . }}">
+				<a href="/nav{{ .Path }}">
 					<li class="list-group-item">
-						<span class="h3">{{ . }}</span>
+						<span class="h3">{{ .Name }}</span>
 					</li>
 				</a>
 			{{ end }}
 		</ul>
-		<h1>Utilities</h1>
-		<a class="h3" href="/dups">Duplicate Runtimes</a>
 	</body>
 </html>
