@@ -16,7 +16,7 @@
     <div style="display: flex; flex-wrap: wrap; height: 100%;">
       {{ range .Images }}
         <div style="width: 50%;">
-          <a class="h4" href="/api/trash{{ .Path }}">{{ .Path }}</a>
+          <a class="h4" href="/browse{{ .Path }}">{{ .Path }}</a> - <a class="h4" href="/api/trash{{ .Path }}">Trash</a>
           {{ if .IsVideo }}
             <video autoplay loop>
               <source src="/raw{{ .Path }}" />
